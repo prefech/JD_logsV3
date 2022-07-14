@@ -69,6 +69,8 @@ ensure JD_logsV3
     - All other bots just need permission to send messages in the channels.
 7. Restart your server and you will see the logs on your discord.
 
+### 📈 Resmon Values.
+![](https://prefech.com/i/7418e619-a9c9-4787-b3ac-b59ad4860768 "Resmon JD_logsV3")
 Info | |
 --- | --- |
 Code is accessible | Yes
