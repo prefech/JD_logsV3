@@ -1,0 +1,40 @@
+{
+    "prefix":"!",
+    "tokens": {
+        "1":{
+            "token": "",
+            "guildID": ""
+        },
+        "2":{
+            "token": "",
+            "guildID": ""
+        }
+    },
+
+    "NameChangePerms": "jd.staff",
+    "screenshotPerms": "jd.staff",
+    
+    "allLogs": true,
+    "postals": true,
+    "weaponLog": true,
+
+    "playerId": true,
+    "steamId": true,
+    "steamUrl": true,
+    "discordId": true,
+    "license": true,
+    "license2": true,
+    "ip": true,
+    "playerPing": true,
+
+    "Session": false,
+    "PlayTime": false,
+    "playerHealth": true,
+    "playerArmor": true,
+
+    "WeaponsNotLogged": [
+        "WEAPON_SNOWBALL",
+        "WEAPON_FIREEXTINGUISHER",
+        "WEAPON_PETROLCAN"
+    ]
+}
