@@ -27,6 +27,7 @@ dependency 'screenshot-basic'
 server_scripts {
     'server/playerDetails.lua',
     'server/main.lua',
+    'server/txAdminEvents.lua',
     'index.js'
 }
 

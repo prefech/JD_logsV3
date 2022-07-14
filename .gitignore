@@ -42,8 +42,6 @@ build/Release
 node_modules/
 jspm_packages/
 
-# My Config File -------------------------------------------------------------------------------------------------------------------------------------------
-config/config.lua
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
@@ -128,3 +126,5 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+config/config.json
+config/channels.json

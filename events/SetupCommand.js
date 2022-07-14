@@ -23,6 +23,7 @@ module.exports = {
 				"resource": "🔧・resource-logs",
 				"nameChange": "💠・namechange-logs",
 				"explosion": "🧨・explosion-logs",
+				"txAdmin": "💻・txadmin-logs",
 				"screenshot": "📸・screenshot-logs"
 			}
 	

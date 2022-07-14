@@ -1,5 +1,5 @@
 {
-  "newInstall": false,
+  "newInstall": true,
   "all": {
     "channelId": "",
     "color": "#A1A1A1",
@@ -87,6 +87,13 @@
     "icon": "📸",
     "color": "#A1A1A1",
     "logHistory": false,
+    "embed": true,
+    "client": 1
+  },
+  "txAdmin": {
+    "channelId": "",
+    "icon": "💻",
+    "color": "#FFFFFF",
     "embed": true,
     "client": 1
   }
