@@ -1,25 +1,25 @@
 {
-  "newInstall": false,
+  "newInstall": true,
   "all": {
-    "channelId": "996871409290715266",
+    "channelId": "",
     "color": "#A1A1A1",
     "embed": true,
     "client": 1
   },
   "system": {
-    "channelId": "996871410897129594",
+    "channelId": "",
     "icon": "🧾",
     "color": "#A1A1A1",
     "embed": true,
     "client": 2
   },
   "imageStore": {
-    "channelId": "996871409689178144",
-    "webhookID": "998358668703694869",
-    "webhookToken": "daUVEo73-OJqsoncN1M4waP5d0qCxldKSXMy2jrVWjBg77Pb02r82n6wo18j7PwKIG38"
+    "channelId": "",
+    "webhookID": "",
+    "webhookToken": ""
   },
   "chat": {
-    "channelId": "996871412037980180",
+    "channelId": "",
     "icon": "💬",
     "color": "#A1A1A1",
     "logHistory": true,
@@ -27,7 +27,7 @@
     "client": 2
   },
   "join": {
-    "channelId": "996871413774418041",
+    "channelId": "",
     "icon": "📥",
     "color": "#3AF241",
     "logHistory": true,
@@ -35,7 +35,7 @@
     "client": 2
   },
   "leave": {
-    "channelId": "996871415947087882",
+    "channelId": "",
     "icon": "📤",
     "color": "#F23A3A",
     "logHistory": true,
@@ -43,7 +43,7 @@
     "client": 2
   },
   "death": {
-    "channelId": "996871418379767950",
+    "channelId": "",
     "icon": "💀",
     "color": "#000000",
     "logHistory": true,
@@ -51,7 +51,7 @@
     "client": 2
   },
   "shooting": {
-    "channelId": "996871420078460938",
+    "channelId": "",
     "icon": "🔫",
     "color": "#2E66F2",
     "logHistory": false,
@@ -59,7 +59,7 @@
     "client": 2
   },
   "resource": {
-    "channelId": "996871421475168310",
+    "channelId": "",
     "icon": "🔧",
     "color": "#EBEE3F",
     "logHistory": true,
@@ -67,7 +67,7 @@
     "client": 2
   },
   "nameChange": {
-    "channelId": "996871423584915527",
+    "channelId": "",
     "icon": "💠",
     "color": "#03FC98",
     "logHistory": true,
@@ -75,7 +75,7 @@
     "client": 2
   },
   "explosion": {
-    "channelId": "996871425573007401",
+    "channelId": "",
     "icon": "🧨",
     "color": "#03FC98",
     "logHistory": true,
@@ -83,7 +83,7 @@
     "client": 2
   },
   "screenshot": {
-    "channelId": "996871427573694466",
+    "channelId": "",
     "icon": "📸",
     "color": "#A1A1A1",
     "logHistory": false,
@@ -91,7 +91,7 @@
     "client": 2
   },
   "txAdmin": {
-    "channelId": "997274048620924958",
+    "channelId": "",
     "icon": "💻",
     "color": "#FFFFFF",
     "embed": true,
