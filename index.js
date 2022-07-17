@@ -27,6 +27,7 @@ for (const x in config.tokens) {
         })
         client[x].on("ready", async () => {
             let dest = false
+            client[x].user.setPresence({ activities: [{ name: `JD_logsV3 • Bot Client: ${x}/${Object.keys(config.tokens).length}`, type: "PLAYING" }], afk: true, status: 'dnd' });
             if(x == '1'){
                 const checkGuild = client[x].guilds.cache.get(config.tokens[x].guildID)
                 for (const i in permissionCheck) {
@@ -42,14 +43,29 @@ for (const x in config.tokens) {
                 console.log(`Client ${client[x].user.tag} ready!`)
             }
         })
+        client[x].on("rateLimit", async (data) => {
+            await console.log(`^1JD_logsV3 Error:^0Rate limit hit on client: ^4${x}^0`)
+            await console.log(`^1JD_logsV3 Error:^0Consider adding another bot token to spread load more.`)
+            await console.log(`^1JD_logsV3 Error:^0Messages will be in a queue until the rate limit ends: ^4${data.timeout/1000}^0 Seconds.`)
+        })
     }
 }
 
-client[1].config = config
+client[1].config = config;
 
 const eventFiles = fs.readdirSync(`${GetResourcePath(GetCurrentResourceName())}/events/`).filter(file => file.endsWith('.js'));
 for (const file of eventFiles) {
 	const event = require(`./events/${file}`);
+	if (event.once) {
+		client[1].once(event.name, (...args) => event.execute(...args));
+	} else {
+		client[1].on(event.name, (...args) => event.execute(...args));
+	}
+}
+
+const commandFiles = fs.readdirSync(`${GetResourcePath(GetCurrentResourceName())}/commands/`).filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+	const event = require(`./commands/${file}`);
 	if (event.once) {
 		client[1].once(event.name, (...args) => event.execute(...args));
 	} else {
@@ -63,7 +79,7 @@ async function sendEmbed(args){
         if(!channels[args.channel]){ return console.log(`^1Error: Channel ${args.channel} not found.^0`)}
         if(!args.client){ args.client = 1 }
         if(!channels[args.channel].icon){ channels[args.channel].icon = "📌" }
-        if(client[args.client].user === null){ return }
+        if(client[args.client].user === null){ return }        
         const guild = await client[args.client].guilds.cache.get(config.tokens[args.client].guildID);
         const channel = await guild.channels.cache.get(channels[args.channel].channelId);
         const embed = new MessageEmbed()
@@ -90,14 +106,20 @@ async function sendEmbed(args){
                 if(args.player_1['info'].discord){
                     disp = `${disp}\n:speech_balloon: **Discord:** <@${args.player_1['info']['discord']}> (${args.player_1['info']['discord']})`
                 }
+                if(args.player_1['info'].ip){
+                    disp = `${disp}\n:link: **IP:** ${args.player_1['info']['ip']}`
+                }
+                if(args.player_1['info'].ping){
+                    disp = `${disp}\n:bar_chart: **Ping:** \`${args.player_1['info']['ping']}ms\``
+                }
                 if(args.player_1['info'].steam){
                     disp = `${disp}\n:video_game: **Steam Hex:** ${args.player_1['info']['steam']['id']}`
                 }
                 if(args.player_1['info']['steam'].url){
                     disp = `${disp} **[Steam Profile](${args.player_1['info']['steam']['url']} "Open Steam Profile")**`
                 }
-                if(args.player_1['info'].license){
-                    disp = `${disp}\n:cd: **License:** ${args.player_1['info']['license'][0]}\n:dvd: **License 2:** ${args.player_1['info']['license'][1]}`
+                if(args.player_1['info'].license[0]){
+                    disp = `${disp}\n:cd: **License:** ${args.player_1['info']['license'][0] ?? 'N/A'}\n:dvd: **License 2:** ${args.player_1['info']['license'][1] ?? 'N/A'}`
                 }
                 embed.addField(args.player_1.title, `${disp}`, true)
             }
@@ -119,13 +141,19 @@ async function sendEmbed(args){
                 if(args.player_2['info'].discord){
                     disp = `${disp}\n:speech_balloon: **Discord:** <@${args.player_2['info']['discord']}> (${args.player_2['info']['discord']})`
                 }
+                if(args.player_2['info'].ip){
+                    disp = `${disp}\n:link: **IP:** ${args.player_2['info']['ip']}`
+                }
+                if(args.player_2['info'].ping){
+                    disp = `${disp}\n:bar_chart: **Ping:** \`${args.player_2['info']['ping']}ms\``
+                }
                 if(args.player_2['info'].steam){
                     disp = `${disp}\n:video_game: **Steam Hex:** ${args.player_2['info']['steam']['id']}`
                 }
                 if(args.player_2['info']['steam'].url){
                     disp = `${disp} **[Steam Profile](${args.player_2['info']['steam']['url']} "Open Steam Profile")**`
                 }
-                if(args.player_2['info'].license){
+                if(args.player_2['info'].license[0]){
                     disp = `${disp}\n:cd: **License:** ${args.player_2['info']['license'][0]}\n:dvd: **License2:** ${args.player_2['info']['license'][1]}`
                 }
                 embed.addField(args.player_2.title, `${disp}`, true)
@@ -140,7 +168,8 @@ async function sendEmbed(args){
             return 200
         } else {
             await channel.send({embeds: [embed]})
-            const all = guild.channels.cache.get(channels['all'].channelId);
+            const guildAll = await client[channels['all'].client].guilds.cache.get(config.tokens[channels['all'].client].guildID);
+            const all = guildAll.channels.cache.get(channels['all'].channelId);            
             all.send({embeds: [embed]})
             return 200
         }
@@ -152,3 +181,22 @@ async function sendEmbed(args){
 exports('sendEmbed', async (args) => {
     return sendEmbed(args)
 });
+
+client[1].on('messageCreate', async (message) => {
+    const {channel, content, guild, author} = message;
+    if(content.toLowerCase().startsWith(`${client[1].config.prefix}jdlogs players`)){
+        const tUser = await message.guild.members.cache.get(author.id);
+        if(!tUser.permissions.has("MANAGE_MESSAGES")) return message.reply({content: "⛔ | Missing Permissions to use this command.\nNeeded permission flag: `MANAGE_MESSAGES`"})
+        const players = await exports[GetCurrentResourceName()].GetPlayers()
+        let playerlist = 'No Players Online.'
+        for (const [k, v] of Object.entries(players)) {
+            console.log(k,v)
+            if(playerlist === 'No Players Online.'){ 
+                playerlist = `**${Number(k) + 1}.** ${GetPlayerName(v)} - Server ID: \`${v}\``
+            } else {
+                playerlist = `\n${playerlist} **${k + 1}.** ${GetPlayerName(v)} - Server ID: \`${v}\``
+            };
+        };
+        message.reply({embeds: [new MessageEmbed().setColor("RANDOM").setDescription(playerlist)]})
+    }
+})

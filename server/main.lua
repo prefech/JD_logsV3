@@ -10,7 +10,7 @@ CreateThread(function()
 		return StopResource(GetCurrentResourceName())
 	end
    	if channelFile['newInstall'] then
-		print('^2Please use the ^1!jdlogd setup ^2command on discord to finish the installation.^0')
+		print('^2Please use the ^1!jdlogs setup ^2command on discord to finish the installation.^0')
 		return StopResource(GetCurrentResourceName())
    	end
 end)
@@ -50,24 +50,28 @@ exports('createLog', function(args)
 	CreateLog(args)
 end)
 
+exports('GetPlayers', function(args)
+	return GetPlayers()
+end)
+
 RegisterCommand('screenshot', function(source, args, RawCommand)
 	if source == 0 then
-		CreateLog({
-			EmbedMessage = "**Screenshot of:** `"..GetPlayerName(args[1]).."`\n**Requested by:** `Console`",
-			player_id = args[1],
-			channel = "screenshot",
-			screenshot = true
-		})
+		TriggerEvent("JD_logsV3:ScreenshotCommand", args[1], 'Console')
 	else
 		if IsPlayerAceAllowed(source, cfgFile['screenshotPerms']) then
-			CreateLog({
-				EmbedMessage = "**Screenshot of:** `"..GetPlayerName(args[1]).."`\n**Requested by:** `"..GetPlayerName(source).."`",
-				player_id = args[1],
-				channel = "screenshot",
-				screenshot = true
-			})
+			TriggerEvent("JD_logsV3:ScreenshotCommand", args[1], GetPlayerName(source))
 		end
 	end
+end)
+
+RegisterNetEvent("JD_logsV3:ScreenshotCommand")
+AddEventHandler("JD_logsV3:ScreenshotCommand", function(tId, src)
+	CreateLog({
+		EmbedMessage = "**Screenshot of:** `"..GetPlayerName(tId).."`\n**Requested by:** `"..src.."`",
+		player_id = tId,
+		channel = "screenshot",
+		screenshot = true
+	})
 end)
 
 AddEventHandler("playerJoining", function(source, oldID)
@@ -149,7 +153,11 @@ end)
 RegisterServerEvent('Prefech:playerShotWeapon')
 AddEventHandler('Prefech:playerShotWeapon', function(weapon, count)
 	if cfgFile['weaponLog'] then
-    	CreateLog({EmbedMessage = ("**%s** fired a **%s** `%s time(s)`."):format(GetPlayerName(source), weapon, count), player_id = source, channel = 'shooting'})
+		if count ~= nil then
+    		CreateLog({EmbedMessage = ("**%s** fired a **%s** `%s time(s)`."):format(GetPlayerName(source), weapon, count), player_id = source, channel = 'shooting'})
+		else
+			CreateLog({EmbedMessage = ("**%s** fired a **%s**."):format(GetPlayerName(source), weapon, count), player_id = source, channel = 'shooting'})
+		end
 	end
 end)
 
