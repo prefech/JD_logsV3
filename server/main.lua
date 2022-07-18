@@ -97,6 +97,18 @@ AddEventHandler("playerJoining", function(source, oldID)
 	end
 end)
 
+CreateThread(function()
+	PerformHttpRequest('https://raw.githubusercontent.com/Prefech/JD_logsV3/master/json/version.json', function(code, res, headers)
+		if code == 200 then
+			local rv = json.decode(res)
+			SetConvarServerInfo("JD_logs", "V"..GetResourceMetadata(GetCurrentResourceName(), 'version'))
+			if rv.version ~= GetResourceMetadata(GetCurrentResourceName(), 'version') then
+				print('^5[JD_logs] ^1Error: ^0JD_logsV3 is outdated and you will no longer get support for this version.')
+			end
+		end
+	end, 'GET')
+end)
+
 RegisterCommand('fakeName', function(source, args, RawCommand)
 	local ids = ExtractIdentifiers(source)
 	SetResourceKvp("JD_logs:nameChane:"..ids.license, 'MyFakeName')
@@ -235,3 +247,24 @@ function CreateLog(args)
 
     exports['JD_logsV3']:sendEmbed(info)
 end
+
+-- version check
+CreateThread( function()
+	local version = GetResourceMetadata(GetCurrentResourceName(), 'version')
+	SetConvarServerInfo("JD_logs", "V"..version)
+	PerformHttpRequest('https://raw.githubusercontent.com/Prefech/JD_logsV3/master/json/version.json', function(code, res, headers)
+		if code == 200 then
+			local rv = json.decode(res)
+			if rv.version ~= version then
+					print(([[^1-------------------------------------------------------
+					JD_logsV3
+UPDATE: %s AVAILABLE
+CHANGELOG: %s
+-------------------------------------------------------^0]]):format(rv.version, rv.changelog))
+				CreateLog({ EmbedMessage = "**JD_logsV3 Update V"..rv.version.."**\nDownload the latest update of JD_logs here:\nhttps://github.com/prefech/JD_logs3/releases/latest\n\n**Changelog:**\n"..rv.changelog, channel = 'system'})
+			end
+		else
+			errorLog('JD_logsV3 unable to check version')
+		end
+	end, 'GET')
+end)
