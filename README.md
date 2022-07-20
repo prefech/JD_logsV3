@@ -1,14 +1,14 @@
 <h4 align="center">
-	<img src="https://img.shields.io/github/release/Prefech/JD_logs.png">
-	<img src="https://img.shields.io/github/last-commit/Prefech/JD_logs">
-	<img src="https://img.shields.io/github/license/Prefech/JD_logs.png">
-	<img src="https://img.shields.io/github/issues/Prefech/JD_logs.png">
-	<img src="https://img.shields.io/github/contributors/Prefech/JD_logs.png">
+	<img src="https://img.shields.io/github/release/Prefech/JD_logsV3.png">
+	<img src="https://img.shields.io/github/last-commit/Prefech/JD_logsV3">
+	<img src="https://img.shields.io/github/license/Prefech/JD_logsV3.png">
+	<img src="https://img.shields.io/github/issues/Prefech/JD_logsV3.png">
+	<img src="https://img.shields.io/github/contributors/Prefech/JD_logsV3.png">
 	<a href="https://discord.gg/prefech" title=""><img alt="Discord Status" src="https://discordapp.com/api/guilds/721339695199682611/widget.png"></a>
 </h4>
 
 <div align="center">
-  <a href="https://github.com/Prefech/JD_logs">
+  <a href="https://github.com/Prefech/JD_logsV3">
     <img src="https://prefech.com/i/JD_logsV3">
   </a>
 
