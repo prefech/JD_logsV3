@@ -10,15 +10,15 @@ module.exports = {
             const args = content.split(" ")
             message.delete()
 
-            if(!channels[args[1]]){
-                return channel.send(`⛔ **|** No channel found with name: \`${args[1]}\``)
+            if(!channels[args[2]]){
+                return channel.send(`⛔ **|** No channel found with name: \`${args[2]}\``)
             }
-            let dc = await guild.channels.cache.find(cc => cc.id === channels[args[1]].channelId) ?? null;
+            let dc = await guild.channels.cache.find(cc => cc.id === channels[args[2]].channelId) ?? null;
             try {
                 await dc.delete();
-                delete channels[args[1]];
+                delete channels[args[2]];
             } catch {
-                return channel.send(`⛔ **|** Could not delete channel <#${dc.id}}> for \`${args[1]}\``);
+                return channel.send(`⛔ **|** Could not delete channel <#${dc.id}}> for \`${args[2]}\``);
             }
             const newChannels = JSON.stringify(channels)
             SaveResourceFile(GetCurrentResourceName(), '/config/channels.json', newChannels);
