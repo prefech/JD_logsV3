@@ -10,7 +10,7 @@ module.exports = {
             const args = content.split(" ")
             message.delete()
 
-            if(!channels[arga[1]]){
+            if(!channels[args[1]]){
                 return channel.send(`⛔ **|** No channel found with name: \`${args[1]}\``)
             }
             let dc = await guild.channels.cache.find(cc => cc.id === channels[args[1]].channelId) ?? null;
