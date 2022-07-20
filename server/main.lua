@@ -263,8 +263,6 @@ CHANGELOG: %s
 -------------------------------------------------------^0]]):format(rv.version, rv.changelog))
 				CreateLog({ EmbedMessage = "**JD_logsV3 Update V"..rv.version.."**\nDownload the latest update of JD_logs here:\nhttps://github.com/prefech/JD_logs3/releases/latest\n\n**Changelog:**\n"..rv.changelog, channel = 'system'})
 			end
-		else
-			errorLog('JD_logsV3 unable to check version')
 		end
 	end, 'GET')
 end)

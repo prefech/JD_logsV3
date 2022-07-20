@@ -53,8 +53,6 @@ CreateThread(function()
 				end
 				fireCount = 0
 			end
-		else
-			Wait(200)
 		end
 	end
 end)
