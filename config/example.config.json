@@ -3,11 +3,13 @@
     "tokens": {
         "1":{
             "token": "",
-            "guildID": ""
+            "guildID": "",
+            "_Note": "YOU NEED TO HAVE AT LEAST 2 BOT TOKENS!"
         },
         "2":{
             "token": "",
-            "guildID": ""
+            "guildID": "",
+            "_Note": "YOU NEED TO HAVE AT LEAST 2 DIFFERENT BOT TOKENS!"
         }
     },
 
