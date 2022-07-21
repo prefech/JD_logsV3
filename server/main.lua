@@ -1,18 +1,40 @@
 local channelsLoadFile = LoadResourceFile(GetCurrentResourceName(), "./config/channels.json")
 local channelFile = json.decode(channelsLoadFile)
+if channelFile == nil then
+	local temp = LoadResourceFile(GetCurrentResourceName(), "./config/example.channels.json")
+	local file = io.open(GetResourcePath(GetCurrentResourceName())..'/config/channels.json', 'w')
+	file:write(temp)
+	file:close()
+	channelsLoadFile = LoadResourceFile(GetCurrentResourceName(), "./config/channels.json")
+	channelFile = json.decode(channelsLoadFile)
+	print('^2Success: ^0We created a channels file for you.\n^1Note: Please Reatsrt JDlogs_V3 to continue.^0')
+end
 
 local configLoadFile = LoadResourceFile(GetCurrentResourceName(), "./config/config.json")
 local cfgFile = json.decode(configLoadFile)
+if cfgFile == nil then
+	local temp = LoadResourceFile(GetCurrentResourceName(), "./config/example.config.json")
+	local file = io.open(GetResourcePath(GetCurrentResourceName())..'/config/config.json', 'w')
+	file:write(temp)
+	file:close()
+	configLoadFile = LoadResourceFile(GetCurrentResourceName(), "./config/config.json")
+	cfgFile = json.decode(channelsLoadFile)
+	print('^2Success: ^0We created a config file for you.\n^1Note: Please Reatsrt JDlogs_V3 to continue.^0')
+end
 
 CreateThread(function()
-	if cfgFile['tokens']['1'].token == '' then
-		print('^1Error: You need to set at least one bot token.^0')
-		return StopResource(GetCurrentResourceName())
+	while true do
+		Wait(0)
+		if cfgFile.tokens ~= nil and channelFile.newInstall ~= nil then
+			if cfgFile['tokens']['1'].token == '' then
+				print('^1Error: You need to set at least one bot token.^0')
+			end
+			if channelFile['newInstall'] then
+				print('^2Please use the ^1!jdlogs setup ^2command on discord to finish the installation.^0')
+			end
+			break
+		end
 	end
-   	if channelFile['newInstall'] then
-		print('^2Please use the ^1!jdlogs setup ^2command on discord to finish the installation.^0')
-		return StopResource(GetCurrentResourceName())
-   	end
 end)
 
 RegisterCommand('jdlogs', function(source, args, RawCommand)
@@ -173,6 +195,42 @@ AddEventHandler('Prefech:playerShotWeapon', function(weapon, count)
 	end
 end)
 
+RegisterServerEvent('Prefech:PlayerDamage')
+AddEventHandler('Prefech:PlayerDamage', function(args)
+	if cfgFile['damageLog'] then
+		iPed = GetPlayerPed(source)
+		cause = GetPedSourceOfDamage(iPed)
+		dType = GetEntityType(cause)
+		if dType == 0 then
+			damageCause = 'themselfs'
+		elseif dType == 1 then
+			if IsPedAPlayer(cause) then
+				if GetVehiclePedIsIn(cause, false) then
+					damageCause = GetPlayerName(cause)..' (Vehicle)'
+				else 
+					damageCause = GetPlayerName(cause)
+				end
+			else
+				if GetVehiclePedIsIn(cause, false) then
+					damageCause = 'AI (Vehicle)'
+				else 
+					damageCause = 'AI'
+				end
+			end
+		elseif dType == 2 then
+			driver = GetPedInVehicleSeat(cause, -1)
+			if IsPedAPlayer(driver) then
+				damageCause = GetPlayerName(cause)..' with a vehicle'
+			else
+				damageCause = 'a vehicle'
+			end			
+		elseif dType == 3 then
+			damageCause = 'a object'
+		end
+		CreateLog({EmbedMessage = ("**%s** Has been damaged by `%s` and lost `%s` health"):format(GetPlayerName(source), damageCause, args), player_id = source, channel = 'damage'})
+	end
+end)
+
 RegisterNetEvent("Prefech:ScreenshotCB")
 AddEventHandler("Prefech:ScreenshotCB", function(args)
 	CreateLog(args)
@@ -208,6 +266,7 @@ AddEventHandler('Prefech:sendClientLogStorage', function(_storage)
 end)
 
 function CreateLog(args)
+	if channelFile[args.channel] == nil then return print('^1Error: Could not find channel: ^2'..args.channel..'^0' ) end
     if args.screenshot then
         if not args.player_id then
             print('can not make a screenshot if there is no know player id.')
@@ -219,9 +278,12 @@ function CreateLog(args)
         end
     end
     info = {
-        channel = args.channel,
-        msg = args.EmbedMessage,
+        channel = args.channel
     }
+
+	if args.EmbedMessage ~= nil then
+		info.msg = args.EmbedMessage
+	end
 
     if args.player_id ~= nil then
         info.player_1 = {
@@ -236,6 +298,20 @@ function CreateLog(args)
             info = GetPlayerDetails(args.player_2_id, args.channel)
         }
     end
+
+	if args.fields ~= nil then
+		if #args.fields	<= 23 then
+			info.fields = {};
+			for k,v in pairs(args.fields) do
+				table.insert( info.fields, {
+					['name'] = v.name,
+					['value'] = v.text,
+					['inline'] = v.inline
+				})
+			end
+		end
+	end
+
     if args.imageUrl then
         info.imageUrl = args.imageUrl;
     end
@@ -245,7 +321,7 @@ function CreateLog(args)
         info.client = 1
     end
 
-    exports['JD_logsV3']:sendEmbed(info)
+    exports[GetCurrentResourceName()]:sendEmbed(info)
 end
 
 -- version check
@@ -261,7 +337,7 @@ CreateThread( function()
 UPDATE: %s AVAILABLE
 CHANGELOG: %s
 -------------------------------------------------------^0]]):format(rv.version, rv.changelog))
-				CreateLog({ EmbedMessage = "**JD_logsV3 Update V"..rv.version.."**\nDownload the latest update of JD_logs here:\nhttps://github.com/prefech/JD_logs3/releases/latest\n\n**Changelog:**\n"..rv.changelog, channel = 'system'})
+				CreateLog({ EmbedMessage = "**JD_logsV3 Update V"..rv.version.."**\nDownload the latest update of JD_logsV3 here:\nhttps://github.com/prefech/JD_logsV3/releases/latest\n\n**Changelog:**\n"..rv.changelog..'\n\n**How to update?**\n1. Download the latest version.\n2. Replace all files with your old once **EXCEPT KEEP THE CONFIG** folder.\n3. run the `!jdlogs setup` command again and you\'re done.', channel = 'system'})
 			end
 		end
 	end, 'GET')

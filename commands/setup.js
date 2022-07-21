@@ -21,6 +21,7 @@ module.exports = {
 				"join": "📥・join-logs",
 				"leave": "📤・leave-logs",
 				"death": "💀・death-logs",
+				"damage": "🩸・damage-logs",
 				"shooting": "🔫・shooting-logs",
 				"resource": "🔧・resource-logs",
 				"nameChange": "💠・namechange-logs",

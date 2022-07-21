@@ -128,3 +128,5 @@ dist
 .pnp.*
 config/config.json
 config/channels.json
+yarn.lock
+.yarn.installed

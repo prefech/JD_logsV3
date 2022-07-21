@@ -7,17 +7,16 @@
     #               | |   | | |  __/ ||  __/ (__| | | |                 #
     #               |_|   |_|  \___|_| \___|\___|_| |_|                 #
     #                                                                   #
-    #                 JD_logs By Prefech 01-11-2021                     #
     #                         www.prefech.com                           #
     #                                                                   #
     #####################################################################
 ]]
 
 
-version '3.0.0'
+version '3.0.1'
 author 'Prefech'
 description 'FXServer logs to Discord (https://prefech.com/)'
-repository 'https://github.com/prefech/JD_logs'
+repository 'https://github.com/prefech/JD_logsV3'
 
 
 dependency 'yarn'

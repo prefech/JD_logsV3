@@ -1,3 +1,5 @@
+const { MessageEmbed } = require("discord.js");
+
 module.exports = {
 	name: 'ready',
 	once: true,
@@ -17,11 +19,11 @@ module.exports = {
         await c.createWebhook('Image Store Webhook', {}).then(async hook => {
             channels['imageStore'].webhookID = hook.id;
             channels['imageStore'].webhookToken = hook.token;
-            console.log(`^2New Screenshot Webhook with Generated. (Old one got deleted)^0`)
+            console.log(`^2New Screenshot Webhook Generated. (Old one got deleted)^0`)
         })
 
         const newChannels = JSON.stringify(channels, null, 2)
         SaveResourceFile(GetCurrentResourceName(), '/config/channels.json', newChannels);
-        c.send(`Webhook for Image store has been Reset!`)
+        c.send({embeds: [new MessageEmbed().setTitle(`🧹・Webhook for Image store has been Reset!`)]})
     }
 };

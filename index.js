@@ -4,7 +4,10 @@ const { glob } = require("glob");
 const { promisify } = require("util");
 const globPromise = promisify(glob);
 
-const config = require("./config/config.json");
+try {
+    config = require("./config/config.json");
+} catch {}
+
 const client = [];
 const permissionCheck = ["MANAGE_CHANNELS", "SEND_MESSAGES", "VIEW_CHANNEL", "MANAGE_WEBHOOKS"]
 
@@ -74,107 +77,111 @@ for (const file of commandFiles) {
 }
 
 async function sendEmbed(args){
-    if(GetCurrentResourceName() === GetInvokingResource()){
-        const channels = JSON.parse(LoadResourceFile(GetCurrentResourceName(), '/config/channels.json'));
-        if(!channels[args.channel]){ return console.log(`^1Error: Channel ${args.channel} not found.^0`)}
-        if(!args.client){ args.client = 1 }
-        if(!channels[args.channel].icon){ channels[args.channel].icon = "📌" }
-        if(client[args.client].user === null){ return }        
-        const guild = await client[args.client].guilds.cache.get(config.tokens[args.client].guildID);
-        const channel = await guild.channels.cache.get(channels[args.channel].channelId);
-        const embed = new MessageEmbed()
-            .setTitle(`${channels[args.channel].icon} ${args.channel.charAt(0).toUpperCase() + args.channel.slice(1)}`)
-            .setDescription(args.msg)
-            .setColor(channels[args.channel].color)
-            .setTimestamp()
-            .setFooter({text: `JD_logs Version: ${GetResourceMetadata(GetCurrentResourceName(), 'version')}`})
-        
-            if(args.player_1){
-                disp = ``
-                if(args.player_1['info'].id){
-                    disp = `:1234: **Player ID:** \`${args.player_1['info'].id}\``
-                }
-                if(args.player_1['info'].postal){
-                    disp = `${disp}\n:map: **Nearest Postal:** \`${args.player_1['info'].postal}\``
-                }
-                if(args.player_1['info'].hp){
-                    disp = `${disp}\n:heart: **Health:** \`${args.player_1['info']['hp'].hp}\`**/**\`${args.player_1['info']['hp'].max_hp}\``
-                }
-                if(args.player_1['info']['hp'].armour !== null && args.player_1['info']['hp'].armour !== undefined){
-                    disp = `${disp} :shield: **Armor:** \`${args.player_1['info']['hp'].armour}\`**/**\`${args.player_1['info']['hp'].max_armour}\``
-                }
-                if(args.player_1['info'].discord){
-                    disp = `${disp}\n:speech_balloon: **Discord:** <@${args.player_1['info']['discord']}> (${args.player_1['info']['discord']})`
-                }
-                if(args.player_1['info'].ip){
-                    disp = `${disp}\n:link: **IP:** ${args.player_1['info']['ip']}`
-                }
-                if(args.player_1['info'].ping){
-                    disp = `${disp}\n:bar_chart: **Ping:** \`${args.player_1['info']['ping']}ms\``
-                }
-                if(args.player_1['info'].steam){
-                    disp = `${disp}\n:video_game: **Steam Hex:** ${args.player_1['info']['steam']['id']}`
-                }
-                if(args.player_1['info']['steam'].url){
-                    disp = `${disp} **[Steam Profile](${args.player_1['info']['steam']['url']} "Open Steam Profile")**`
-                }
-                if(args.player_1['info'].license[0]){
-                    disp = `${disp}\n:cd: **License:** ${args.player_1['info']['license'][0] ?? 'N/A'}\n:dvd: **License 2:** ${args.player_1['info']['license'][1] ?? 'N/A'}`
-                }
-                embed.addField(args.player_1.title, `${disp}`, true)
-            }
-
-            if(args.player_2){
-                disp = ``
-                if(args.player_2['info'].id){
-                    disp = `:1234: **Player ID:** \`${args.player_2['info'].id}\``
-                }
-                if(args.player_2['info'].postal){
-                    disp = `${disp}\n:map: **Nearest Postal:** \`${args.player_2['info'].postal}\``
-                }
-                if(args.player_2['info'].hp){
-                    disp = `${disp}\n:heart: **Health:** \`${args.player_2['info']['hp'].hp}\`**/**\`${args.player_2['info']['hp'].max_hp}\``
-                }
-                if(args.player_2['info']['hp'].armour !== null && args.player_2['info']['hp'].armour !== undefined){
-                    disp = `${disp} :shield: **Armor:** \`${args.player_2['info']['hp'].armour}\`**/**\`${args.player_2['info']['hp'].max_armour}\``
-                }
-                if(args.player_2['info'].discord){
-                    disp = `${disp}\n:speech_balloon: **Discord:** <@${args.player_2['info']['discord']}> (${args.player_2['info']['discord']})`
-                }
-                if(args.player_2['info'].ip){
-                    disp = `${disp}\n:link: **IP:** ${args.player_2['info']['ip']}`
-                }
-                if(args.player_2['info'].ping){
-                    disp = `${disp}\n:bar_chart: **Ping:** \`${args.player_2['info']['ping']}ms\``
-                }
-                if(args.player_2['info'].steam){
-                    disp = `${disp}\n:video_game: **Steam Hex:** ${args.player_2['info']['steam']['id']}`
-                }
-                if(args.player_2['info']['steam'].url){
-                    disp = `${disp} **[Steam Profile](${args.player_2['info']['steam']['url']} "Open Steam Profile")**`
-                }
-                if(args.player_2['info'].license[0]){
-                    disp = `${disp}\n:cd: **License:** ${args.player_2['info']['license'][0]}\n:dvd: **License2:** ${args.player_2['info']['license'][1]}`
-                }
-                embed.addField(args.player_2.title, `${disp}`, true)
-            }
-            
-            if(args.imageUrl){
-                embed.setImage(args.imageUrl)
-            }
-
-        if(args.channel === 'system'){
-            await channel.send({content: "||Tags: @here||", embeds: [embed]})
-            return 200
-        } else {
-            await channel.send({embeds: [embed]})
-            const guildAll = await client[channels['all'].client].guilds.cache.get(config.tokens[channels['all'].client].guildID);
-            const all = guildAll.channels.cache.get(channels['all'].channelId);            
-            all.send({embeds: [embed]})
-            return 200
+if(GetCurrentResourceName() !== GetInvokingResource()) return 505
+    const channels = JSON.parse(LoadResourceFile(GetCurrentResourceName(), '/config/channels.json'));
+    if(!channels[args.channel]){ return console.log(`^1Error: Channel ${args.channel} not found.^0`)}
+    if(!args.client){ args.client = 1 }
+    if(!channels[args.channel].icon){ channels[args.channel].icon = "📌" }
+    if(client[args.client].user === null){ return }        
+    const guild = await client[args.client].guilds.cache.get(config.tokens[args.client].guildID);
+    const channel = await guild.channels.cache.get(channels[args.channel].channelId);
+    const embed = new MessageEmbed()
+        .setTitle(`${channels[args.channel].icon} ${args.channel.charAt(0).toUpperCase() + args.channel.slice(1)}`)
+        .setColor(channels[args.channel].color)
+        .setTimestamp()
+        .setFooter({text: `JD_logs Version: ${GetResourceMetadata(GetCurrentResourceName(), 'version')}`})
+    
+        if(args.msg){
+            embed.setDescription(args.msg)
         }
-    } else {        
-        return 505
+
+        if(args.player_1){
+            disp = ``
+            if(args.player_1['info'].id){
+                disp = `:1234: **Player ID:** \`${args.player_1['info'].id}\``
+            }
+            if(args.player_1['info'].postal){
+                disp = `${disp}\n:map: **Nearest Postal:** \`${args.player_1['info'].postal}\``
+            }
+            if(args.player_1['info'].hp){
+                disp = `${disp}\n:heart: **Health:** \`${args.player_1['info']['hp'].hp}\`**/**\`${args.player_1['info']['hp'].max_hp}\``
+            }
+            if(args.player_1['info']['hp'].armour !== null && args.player_1['info']['hp'].armour !== undefined){
+                disp = `${disp} :shield: **Armor:** \`${args.player_1['info']['hp'].armour}\`**/**\`${args.player_1['info']['hp'].max_armour}\``
+            }
+            if(args.player_1['info'].discord){
+                disp = `${disp}\n:speech_balloon: **Discord:** <@${args.player_1['info']['discord']}> (${args.player_1['info']['discord']})`
+            }
+            if(args.player_1['info'].ip){
+                disp = `${disp}\n:link: **IP:** ||${args.player_1['info']['ip']}||`
+            }
+            if(args.player_1['info'].ping){
+                disp = `${disp}\n:bar_chart: **Ping:** \`${args.player_1['info']['ping']}ms\``
+            }
+            if(args.player_1['info'].steam){
+                disp = `${disp}\n:video_game: **Steam Hex:** ${args.player_1['info']['steam']['id']}`
+            }
+            if(args.player_1['info']['steam'].url){
+                disp = `${disp} **[Steam Profile](${args.player_1['info']['steam']['url']} "Open Steam Profile")**`
+            }
+            if(args.player_1['info'].license[0]){
+                disp = `${disp}\n:cd: **License:** ${args.player_1['info']['license'][0] ?? 'N/A'}\n:dvd: **License 2:** ${args.player_1['info']['license'][1] ?? 'N/A'}`
+            }
+            embed.addField(args.player_1.title, `${disp}`, true)
+        }
+
+        if(args.player_2){
+            disp = ``
+            if(args.player_2['info'].id){
+                disp = `:1234: **Player ID:** \`${args.player_2['info'].id}\``
+            }
+            if(args.player_2['info'].postal){
+                disp = `${disp}\n:map: **Nearest Postal:** \`${args.player_2['info'].postal}\``
+            }
+            if(args.player_2['info'].hp){
+                disp = `${disp}\n:heart: **Health:** \`${args.player_2['info']['hp'].hp}\`**/**\`${args.player_2['info']['hp'].max_hp}\``
+            }
+            if(args.player_2['info']['hp'].armour !== null && args.player_2['info']['hp'].armour !== undefined){
+                disp = `${disp} :shield: **Armor:** \`${args.player_2['info']['hp'].armour}\`**/**\`${args.player_2['info']['hp'].max_armour}\``
+            }
+            if(args.player_2['info'].discord){
+                disp = `${disp}\n:speech_balloon: **Discord:** <@${args.player_2['info']['discord']}> (${args.player_2['info']['discord']})`
+            }
+            if(args.player_2['info'].ip){
+                disp = `${disp}\n:link: **IP:** ${args.player_2['info']['ip']}`
+            }
+            if(args.player_2['info'].ping){
+                disp = `${disp}\n:bar_chart: **Ping:** \`${args.player_2['info']['ping']}ms\``
+            }
+            if(args.player_2['info'].steam){
+                disp = `${disp}\n:video_game: **Steam Hex:** ${args.player_2['info']['steam']['id']}`
+            }
+            if(args.player_2['info']['steam'].url){
+                disp = `${disp} **[Steam Profile](${args.player_2['info']['steam']['url']} "Open Steam Profile")**`
+            }
+            if(args.player_2['info'].license[0]){
+                disp = `${disp}\n:cd: **License:** ${args.player_2['info']['license'][0]}\n:dvd: **License2:** ${args.player_2['info']['license'][1]}`
+            }
+            embed.addField(args.player_2.title, `${disp}`, true)
+        }
+        
+        if(args.imageUrl){
+            embed.setImage(args.imageUrl)
+        }
+
+        if(args.fields){
+            embed.addFields(args.fields)
+        }
+
+    if(args.channel === 'system'){
+        await channel.send({content: "||Tags: @here||", embeds: [embed]})
+        return 200
+    } else {
+        await channel.send({embeds: [embed]})
+        const guildAll = await client[channels['all'].client].guilds.cache.get(config.tokens[channels['all'].client].guildID);
+        const all = guildAll.channels.cache.get(channels['all'].channelId);            
+        all.send({embeds: [embed]})
+        return 200
     }
 }
 

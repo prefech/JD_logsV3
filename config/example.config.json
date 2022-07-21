@@ -17,6 +17,7 @@
     "allLogs": true,
     "postals": true,
     "weaponLog": true,
+    "damageLog": true,
 
     "playerId": true,
     "steamId": true,

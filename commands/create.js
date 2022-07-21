@@ -72,14 +72,14 @@ module.exports = {
 			.setDescription(`**Details:**\n\n**Export Channel:** \`${newChannel.name}\`\n**Discord Channel Name:** \`#・${newChannel.name}-logs\` - \`${channels[newChannel.name].channelId}\`\n**Message Icon:** ${newChannel.icon}\n**Embed Color:** \`${newChannel.color}\`\n**Bot Client:** \`${newChannel.client}\``)
 			.setTitle("New Channel Created")
 			.addField("Export for channel:", `\`\`\`lua
-exports.JD_logs:createLog({
+exports['${GetCurrentResourceName()}']:createLog({
 	EmbedMessage = "EMBED MESSAGE",
 	player_id = SERVER_ID_PLAYER_ONE,
 	player_2_id = SERVER_ID_PLAYER_TWO,
 	channel = "${newChannel.name}",
 	screenshot = false
 })
-\`\`\`\n*More info about using the export can be found here: <https://docs.prefech.com/jd_logs/export>*`)
+\`\`\`\n*More info about using the export can be found here: <https://docs.prefech.com/jd_logsv3/export>*`)
 					channel.send({embeds: [embed]})
 				} else {
 					channel.send({content:`:no_entry: **|** Channel with the name \`#${`・${newChannel.name}-logs`}\` already exsists.\n<#${channels[newChannel.name].channelId}>`})

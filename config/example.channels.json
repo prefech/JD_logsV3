@@ -96,5 +96,12 @@
     "color": "#FFFFFF",
     "embed": true,
     "client": 2
+  },
+  "damage": {
+    "channelId": "",
+    "icon": "🩸",
+    "color": "#FF0000",
+    "embed": true,
+    "client": 2
   }
 }

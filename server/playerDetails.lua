@@ -1,10 +1,13 @@
 local configLoadFile = LoadResourceFile(GetCurrentResourceName(), "./config/config.json")
 local cfgFile = json.decode(configLoadFile)
 
-if cfgFile == nil then
-    print('^5[JD_logs] ^1Error: Could not load config file. Make sure you didn\'t make a typo.^0')
-    return StopResource(GetCurrentResourceName())
-end
+CreateThread(function()
+    while cfgFile == nil do
+        Wait(0)
+        configLoadFile = LoadResourceFile(GetCurrentResourceName(), "./config/config.json")
+        cfgFile = json.decode(configLoadFile)
+    end
+end)
 
 function GetPlayerDetails(src, channel)
     local ids = ExtractIdentifiers(src)
@@ -53,7 +56,7 @@ function GetPlayerDetails(src, channel)
         _license2 = nil
     end
 
-	if cfgFile['ip'] and GetResourceKvpString("JD_logs:"..channel:lower()..":ip") ~= 'true' then
+    if cfgFile['ip'] and GetResourceKvpString("JD_logs:"..channel:lower()..":ip") ~= 'true' then
         _ip = ids.ip:gsub("ip:", "")
     else
         _ip = nil
