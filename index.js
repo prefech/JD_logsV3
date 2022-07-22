@@ -18,31 +18,39 @@ for (const x in config.tokens) {
     });
     if(config.tokens[x].guildID == ''){
         console.log(`^1JD_logsV3 Error:^0 Bot ^4${x}^0 is missing a GuildID in de config.`)
-        return console.log(`^1JD_logsV3 Error:^0 Make sure to add this to your config or the bot won't send any messages.`) 
+        console.log(`^1JD_logsV3 Error:^0 Make sure to add this to your config or the bot won't send any messages.`) 
     }
     if(config.tokens[x].token !== ''){
-        client[x].login(config.tokens[x].token).catch(async err => {
-            if (err.code === 'DISALLOWED_INTENTS'){
-                await console.log(`^1JD_logsV3 Error:^0 Bot ^4${x}^0 Does not have the required Intents.`)
-                await console.log(`^1JD_logsV3 Error:^0 Please make sure to add the following Intents to the bot:`)
-                await console.log(`^1JD_logsV3 Error:^0 • PRESENCE INTENT`)
-                await console.log(`^1JD_logsV3 Error:^0 • SERVER MEMBERS INTENT`)
-                await console.log(`^1JD_logsV3 Error:^0 • MESSAGE CONTENT INTENT`)
-            } else if(err.code === 'TOKEN_INVALID') {
-                await console.log(`^1JD_logsV3 Error:^0 Bot Token for bot ^4${x}^0 is invalid.`)
-            }
-        })
+        try{
+            client[x].login(config.tokens[x].token).catch(async err => {
+                if (err.code === 'DISALLOWED_INTENTS'){
+                    await console.log(`^1JD_logsV3 Error:^0 Bot ^4${x}^0 Does not have the required Intents.`)
+                    await console.log(`^1JD_logsV3 Error:^0 Please make sure to add the following Intents to the bot:`)
+                    await console.log(`^1JD_logsV3 Error:^0 • PRESENCE INTENT`)
+                    await console.log(`^1JD_logsV3 Error:^0 • SERVER MEMBERS INTENT`)
+                    await console.log(`^1JD_logsV3 Error:^0 • MESSAGE CONTENT INTENT`)
+                } else if(err.code === 'TOKEN_INVALID') {
+                    await console.log(`^1JD_logsV3 Error:^0 Bot Token for bot ^4${x}^0 is invalid.`)
+                }
+            })
+        } catch {
+            console.log(`^1JD_logsV3 Error:^0 Could not login with bot token ${x}`)
+        }
         client[x].on("ready", async () => {
             let dest = false
             client[x].user.setPresence({ activities: [{ name: `JD_logsV3 • Bot Client: ${x}/${Object.keys(config.tokens).length}`, type: "PLAYING" }], afk: true, status: 'dnd' });
             if(x == '1'){
-                const checkGuild = client[x].guilds.cache.get(config.tokens[x].guildID)
-                for (const i in permissionCheck) {
-                    if(!checkGuild.me.permissions.has(permissionCheck[i])){
-                        await console.log(`^1JD_logsV3 Error:^0 Bot ^4${client[x].user.tag}^0 is missing the ^4${permissionCheck[i]}^0 permission.`)
-                        dest = true
-                    }
-                };
+                try{
+                    const checkGuild = client[x].guilds.cache.get(config.tokens[x].guildID)
+                    for (const i in permissionCheck) {
+                        if(!checkGuild.me.permissions.has(permissionCheck[i])){
+                            await console.log(`^1JD_logsV3 Error:^0 Bot ^4${client[x].user.tag}^0 is missing the ^4${permissionCheck[i]}^0 permission.`)
+                            dest = true
+                        }
+                    };
+                } catch {
+                    console.log(`^1JD_logsV3 Error:^0 Could not verify permissions for ^4${client[x].user.tag}^0. Make sure you added a guild id.`)
+                }
             }
             if(dest){
                 console.log(`^1JD_logsV3 Error:^0 Fix the permissions for ^4${client[x].user.tag}^0 and restart JD_logsV3!`)
