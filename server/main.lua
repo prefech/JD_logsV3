@@ -205,13 +205,14 @@ AddEventHandler('Prefech:PlayerDamage', function(args)
 			damageCause = 'themselfs'
 		elseif dType == 1 then
 			if IsPedAPlayer(cause) then
-				if GetVehiclePedIsIn(cause, false) then
-					damageCause = GetPlayerName(cause)..' (Vehicle)'
+				if GetVehiclePedIsIn(cause, false) ~= 0 then
+					print(GetVehiclePedIsIn(cause, false))
+					damageCause = GetPlayerName(getPlayerId(cause))..'(Vehicle)'
 				else 
-					damageCause = GetPlayerName(cause)
+					damageCause = GetPlayerName(getPlayerId(cause))
 				end
 			else
-				if GetVehiclePedIsIn(cause, false) then
+				if GetVehiclePedIsIn(cause, false) ~= 0 then
 					damageCause = 'AI (Vehicle)'
 				else 
 					damageCause = 'AI'
@@ -231,6 +232,14 @@ AddEventHandler('Prefech:PlayerDamage', function(args)
 	end
 end)
 
+function getPlayerId(ped)
+	for k,v in pairs(GetPlayers()) do
+	   	if GetPlayerPed(v) == ped then
+			return v
+	   	end
+	end
+end
+
 RegisterNetEvent("Prefech:ScreenshotCB")
 AddEventHandler("Prefech:ScreenshotCB", function(args)
 	CreateLog(args)
@@ -242,20 +251,23 @@ AddEventHandler('Prefech:ClientDiscord', function(args)
 end)
 
 CreateThread(function()
-    Wait(10 * 1000)
     while true do
-        PerformHttpRequest('https://cdn.prefech.dev/api/systemMessage.json', function(code, res, headers)
+        PerformHttpRequest('https://api.prefech.dev/v1/fivem/jdlogs/systemMsg', function(code, res, headers)
             if code == 200 then
-                local rv = json.decode(res)
-                lastSend = GetResourceKvpString("JD_logs:SystemMessage")
-                if rv.UUID ~= lastSend then
-                    print('**'..rv.title..'**\n'..rv.description)
-                    CreateLog({ EmbedMessage = '**'..rv.title..'**\n'..rv.description, channel = 'system'})
-                    SetResourceKvp("JD_logs:SystemMessage", rv.UUID)
-                end
+				local rv = json.decode(res)
+				if rv.item.id then
+					if os.time(os.date("!*t")) - tonumber(rv.item.date) < (7 * 24 * 60 * 60) then
+						print('^1JD_logs System Message\n^1--------------------^0\n^2'..rv.item.title..'^0\n'..rv.item.message..'\n^1--------------------^0')
+						CreateLog({ EmbedMessage = '**'..rv.item.title..'**\n'..rv.item.message, channel = 'system'})
+					end
+					SetResourceKvp("JD_logs:SystemMessage", ''..rv.item.id..'')
+				end
             end
-        end, 'GET')
-        Wait(15 * 60 * 1000)
+        end, 'GET', nil, {
+            ['Token'] = 'JD_logsV3',
+			['Last'] = GetResourceKvpString('JD_logs:SystemMessage')
+        })
+        Wait(1000)
     end
 end)
 

@@ -16,10 +16,14 @@ for (const x in config.tokens) {
         intents: 32767,
         partials: ["CHANNEL"],
     });
+    if(config.tokens[x].guildID){
+        await console.log(`^1JD_logsV3 Error:^0 Bot ^4${x}^0 is missing a GuildID in de config.`)
+        await console.log(`^1JD_logsV3 Error:^0 Make sure to add this to your config or the bot won't send any messages.`) 
+    }
     if(config.tokens[x].token !== ''){
         client[x].login(config.tokens[x].token).catch(async err => {
             if (err.code === 'DISALLOWED_INTENTS'){
-                await console.log(`^1JD_logsV3 Error:^0 Bot ^4${client[x].user.tag}^0 Does not have the required Intents.`)
+                await console.log(`^1JD_logsV3 Error:^0 Bot ^4${x}^0 Does not have the required Intents.`)
                 await console.log(`^1JD_logsV3 Error:^0 Please make sure to add the following Intents to the bot:`)
                 await console.log(`^1JD_logsV3 Error:^0 • PRESENCE INTENT`)
                 await console.log(`^1JD_logsV3 Error:^0 • SERVER MEMBERS INTENT`)
@@ -174,7 +178,7 @@ if(GetCurrentResourceName() !== GetInvokingResource()) return 505
         }
 
     if(args.channel === 'system'){
-        await channel.send({content: "||Tags: @here||", embeds: [embed]})
+        await channel.send({embeds: [embed]})
         return 200
     } else {
         await channel.send({embeds: [embed]})
