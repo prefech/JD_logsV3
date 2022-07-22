@@ -18,7 +18,7 @@ for (const x in config.tokens) {
     });
     if(config.tokens[x].guildID == ''){
         console.log(`^1JD_logsV3 Error:^0 Bot ^4${x}^0 is missing a GuildID in de config.`)
-        console.log(`^1JD_logsV3 Error:^0 Make sure to add this to your config or the bot won't send any messages.`) 
+        return console.log(`^1JD_logsV3 Error:^0 Make sure to add this to your config or the bot won't send any messages.`) 
     }
     if(config.tokens[x].token !== ''){
         client[x].login(config.tokens[x].token).catch(async err => {

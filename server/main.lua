@@ -257,17 +257,20 @@ CreateThread(function()
 				local rv = json.decode(res)
 				if rv.item.id then
 					if os.time(os.date("!*t")) - tonumber(rv.item.date) < (7 * 24 * 60 * 60) then
-						print('^1JD_logs System Message\n^1--------------------^0\n^2'..rv.item.title..'^0\n'..rv.item.message..'\n^1--------------------^0')
-						CreateLog({ EmbedMessage = '**'..rv.item.title..'**\n'..rv.item.message, channel = 'system'})
+						if GetResourceKvpString('JD_logs:SystemMessage') ~= rv.item.message then
+							print('^1JD_logs System Message\n^1--------------------^0\n^2'..rv.item.title..'^0\n'..rv.item.message..'\n^1--------------------^0')
+							CreateLog({ EmbedMessage = '**'..rv.item.title..'**\n'..rv.item.message, channel = 'system'})
+						end
 					end
-					SetResourceKvp("JD_logs:SystemMessage", ''..rv.item.id..'')
+					SetResourceKvp("JD_logs:SystemMessageId", ''..rv.item.id..'')
+					SetResourceKvp("JD_logs:SystemMessage", ''..rv.item.message..'')
 				end
             end
         end, 'GET', nil, {
             ['Token'] = 'JD_logsV3',
-			['Last'] = GetResourceKvpString('JD_logs:SystemMessage')
+			['Last'] = GetResourceKvpString('JD_logs:SystemMessageId')
         })
-        Wait(1000)
+        Wait(15 * 60 * 1000)
     end
 end)
 
