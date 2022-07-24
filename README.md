@@ -21,7 +21,7 @@
     ·
     <a href="https://discord.gg/E9FceTnsJV">Request Feature</a>
     ·
-    <a href="https://docs.prefech.com/JD_logsV3/">Documentation</a>
+    <a href="https://docs.prefech.com/jd_logsv3/">Documentation</a>
   </p>
   <a href="https://discord.gg/prefech" title=""><img alt="Discord Invite" src="https://discordapp.com/api/guilds/721339695199682611/widget.png?style=banner2"></a>
 </div>
