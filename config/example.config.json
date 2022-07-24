@@ -14,23 +14,22 @@
     },
 
     "NameChangePerms": "jd.staff",
-    "screenshotPerms": "jd.staff",
-    
+    "screenshotPerms": "jd.staff",    
+
     "allLogs": true,
-    "postals": true,
     "weaponLog": true,
     "damageLog": true,
 
     "playerId": true,
-    "steamId": true,
-    "steamUrl": true,
-    "discordId": true,
-    "license": true,
-    "license2": true,
-    "ip": true,
-    "playerPing": true,
+    "postals": true,
     "playerHealth": true,
     "playerArmor": true,
+    "discordId": true,
+    "ip": true,
+    "playerPing": true,
+    "steamId": true,
+    "steamUrl": true,
+    "license": true,
 
     "WeaponsNotLogged": [
         "WEAPON_SNOWBALL",

@@ -1,5 +1,5 @@
 {
-    "date": "Jul 22, 2022",
-    "version": "3.0.2",
-    "changelog": "Changed:\n• Added some more checks so errors will be more clear and shown how you can dix them"
+    "date": "Jul 24, 2022",
+    "version": "3.0.3",
+    "changelog": "Added:\n• Command in discord to enable/disable embeds.\n\nFixed:\n• Not being able to disable embeds.\n• Hiding didn't remove all info\n• Issue with rate limit alert.\n\nChanged:\n• Added command to the docs."
 }

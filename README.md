@@ -1,8 +1,5 @@
 <h4 align="center">
-	<img src="https://img.shields.io/github/release/Prefech/JD_logsV3.png">
 	<img src="https://img.shields.io/github/last-commit/Prefech/JD_logsV3">
-	<img src="https://img.shields.io/github/license/Prefech/JD_logsV3.png">
-	<img src="https://img.shields.io/github/issues/Prefech/JD_logsV3.png">
 	<img src="https://img.shields.io/github/contributors/Prefech/JD_logsV3.png">
 	<a href="https://discord.gg/prefech" title=""><img alt="Discord Status" src="https://discordapp.com/api/guilds/721339695199682611/widget.png"></a>
 </h4>
@@ -17,11 +14,11 @@
   <p align="center">
     New JD_logs Server logger.
     <br />    
-    <a href="https://discord.gg/5WJGmFQUjt">Report Bug</a>
+    <a href="https://discord.gg/prefech">Report Bug</a>
     ·
-    <a href="https://discord.gg/E9FceTnsJV">Request Feature</a>
+    <a href="https://discord.gg/prefech">Request Feature</a>
     ·
-    <a href="https://docs.prefech.com/JD_logsV3/">Documentation</a>
+    <a href="https://docs.prefech.com/jd_logsv3/">Documentation</a>
   </p>
   <a href="https://discord.gg/prefech" title=""><img alt="Discord Invite" src="https://discordapp.com/api/guilds/721339695199682611/widget.png?style=banner2"></a>
 </div>
@@ -50,7 +47,7 @@
 
 ### 🔧 Download & Installation
 
-1. Download the latest version from github: https://github.com/prefech/JD_logsV3/
+1. Download the latest version from [github](https://github.com/prefech/JD_logsV3/)
   - Click the `Code` button and then `Download ZIP`
   ![](https://prefech.com/i/424808e1-f68a-4af3-b697-5c7e8cd32290 "Clone Screen")
 2. Put the JD_logsV3 folder in the server resource directory

@@ -18,7 +18,7 @@ if cfgFile == nil then
 	file:write(temp)
 	file:close()
 	configLoadFile = LoadResourceFile(GetCurrentResourceName(), "./config/config.json")
-	cfgFile = json.decode(channelsLoadFile)
+	cfgFile = json.decode(configLoadFile)
 	print('^2Success: ^0We created a config file for you.\n^1Note: Please Reatsrt JDlogs_V3 to continue.^0')
 end
 
@@ -78,9 +78,15 @@ end)
 
 RegisterCommand('screenshot', function(source, args, RawCommand)
 	if source == 0 then
+		if args[1] == nil then
+			return console.log('^1JD_logs Error:^0 Please insert a target (1 argument expected got nil)')
+		end
 		TriggerEvent("JD_logsV3:ScreenshotCommand", args[1], 'Console')
 	else
 		if IsPlayerAceAllowed(source, cfgFile['screenshotPerms']) then
+			if args[1] == nil then
+				return TriggerClientEvent('chat:addMessage', source, {color = {255, 0, 0}, args = {"JD_logsV3", "Please insert a target (use /screenshot id)"}})
+			end
 			TriggerEvent("JD_logsV3:ScreenshotCommand", args[1], GetPlayerName(source))
 		end
 	end
@@ -120,20 +126,18 @@ AddEventHandler("playerJoining", function(source, oldID)
 end)
 
 CreateThread(function()
+	local current = GetResourceMetadata(GetCurrentResourceName(), 'version')
 	PerformHttpRequest('https://raw.githubusercontent.com/Prefech/JD_logsV3/master/json/version.json', function(code, res, headers)
 		if code == 200 then
 			local rv = json.decode(res)
-			SetConvarServerInfo("JD_logs", "V"..GetResourceMetadata(GetCurrentResourceName(), 'version'))
-			if rv.version ~= GetResourceMetadata(GetCurrentResourceName(), 'version') then
+			SetConvarServerInfo("JD_logs", "V"..current)
+			if rv.version ~= current then
 				print('^5[JD_logs] ^1Error: ^0JD_logsV3 is outdated and you will no longer get support for this version.')
 			end
 		end
 	end, 'GET')
-end)
-
-RegisterCommand('fakeName', function(source, args, RawCommand)
-	local ids = ExtractIdentifiers(source)
-	SetResourceKvp("JD_logs:nameChane:"..ids.license, 'MyFakeName')
+	Wait(10 * 1000)
+	SetResourceKvp("JD_logs:LastVersion", current) -- This KVP is used for making the correct changes to config files when updating to the latest version.
 end)
 
 CreateThread(function()

@@ -6,6 +6,7 @@ const globPromise = promisify(glob);
 
 try {
     config = require("./config/config.json");
+    channels = require("./config/channels.json");
 } catch {}
 
 const client = [];
@@ -59,6 +60,7 @@ for (const x in config.tokens) {
             }
         })
         client[x].on("rateLimit", async (data) => {
+            if(Math.floor(data.timeout/1000) < 10 ) return
             await console.log(`^1JD_logsV3 Error:^0Rate limit hit on client: ^4${x}^0`)
             await console.log(`^1JD_logsV3 Error:^0Consider adding another bot token to spread load more.`)
             await console.log(`^1JD_logsV3 Error:^0Messages will be in a queue until the rate limit ends: ^4${data.timeout/1000}^0 Seconds.`)
@@ -90,7 +92,6 @@ for (const file of commandFiles) {
 
 async function sendEmbed(args){
 if(GetCurrentResourceName() !== GetInvokingResource()) return 505
-    const channels = JSON.parse(LoadResourceFile(GetCurrentResourceName(), '/config/channels.json'));
     if(!channels[args.channel]){ return console.log(`^1Error: Channel ${args.channel} not found.^0`)}
     if(!args.client){ args.client = 1 }
     if(!channels[args.channel].icon){ channels[args.channel].icon = "📌" }
@@ -109,34 +110,34 @@ if(GetCurrentResourceName() !== GetInvokingResource()) return 505
 
         if(args.player_1){
             disp = ``
-            if(args.player_1['info'].id){
+            if(args.player_1['info'].id && config.playerId){
                 disp = `:1234: **Player ID:** \`${args.player_1['info'].id}\``
             }
-            if(args.player_1['info'].postal){
+            if(args.player_1['info'].postal && config.postals){
                 disp = `${disp}\n:map: **Nearest Postal:** \`${args.player_1['info'].postal}\``
             }
-            if(args.player_1['info'].hp){
+            if(args.player_1['info'].hp && config.playerHealth){
                 disp = `${disp}\n:heart: **Health:** \`${args.player_1['info']['hp'].hp}\`**/**\`${args.player_1['info']['hp'].max_hp}\``
             }
-            if(args.player_1['info']['hp'].armour !== null && args.player_1['info']['hp'].armour !== undefined){
+            if(args.player_1['info']['hp'].armour && config.playerArmor){
                 disp = `${disp} :shield: **Armor:** \`${args.player_1['info']['hp'].armour}\`**/**\`${args.player_1['info']['hp'].max_armour}\``
             }
-            if(args.player_1['info'].discord){
+            if(args.player_1['info'].discord && config.discordId){
                 disp = `${disp}\n:speech_balloon: **Discord:** <@${args.player_1['info']['discord']}> (${args.player_1['info']['discord']})`
             }
-            if(args.player_1['info'].ip){
+            if(args.player_1['info'].ip && config.ip){
                 disp = `${disp}\n:link: **IP:** ||${args.player_1['info']['ip']}||`
             }
-            if(args.player_1['info'].ping){
+            if(args.player_1['info'].ping && config.playerPing){
                 disp = `${disp}\n:bar_chart: **Ping:** \`${args.player_1['info']['ping']}ms\``
             }
-            if(args.player_1['info'].steam){
+            if(args.player_1['info'].steam && config.steamId){
                 disp = `${disp}\n:video_game: **Steam Hex:** ${args.player_1['info']['steam']['id']}`
             }
-            if(args.player_1['info']['steam'].url){
+            if(args.player_1['info']['steam'].url && config.steamURL){
                 disp = `${disp} **[Steam Profile](${args.player_1['info']['steam']['url']} "Open Steam Profile")**`
             }
-            if(args.player_1['info'].license[0]){
+            if(args.player_1['info'].license[0] && config.license){
                 disp = `${disp}\n:cd: **License:** ${args.player_1['info']['license'][0] ?? 'N/A'}\n:dvd: **License 2:** ${args.player_1['info']['license'][1] ?? 'N/A'}`
             }
             embed.addField(args.player_1.title, `${disp}`, true)
@@ -189,10 +190,18 @@ if(GetCurrentResourceName() !== GetInvokingResource()) return 505
         await channel.send({embeds: [embed]})
         return 200
     } else {
-        await channel.send({embeds: [embed]})
+        if(channels[args.channel].embed){
+            await channel.send({embeds: [embed]})
+        } else {
+            await channel.send({content: args.msg})
+        }
         const guildAll = await client[channels['all'].client].guilds.cache.get(config.tokens[channels['all'].client].guildID);
-        const all = guildAll.channels.cache.get(channels['all'].channelId);            
-        all.send({embeds: [embed]})
+        const all = guildAll.channels.cache.get(channels['all'].channelId);
+        if(channels['all'].embed){
+            await all.send({embeds: [embed]})   
+        } else {
+            await all.send({content: args.msg})
+        }
         return 200
     }
 }
