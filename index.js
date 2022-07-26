@@ -187,20 +187,40 @@ if(GetCurrentResourceName() !== GetInvokingResource()) return 505
         }
 
     if(args.channel === 'system'){
-        await channel.send({embeds: [embed]})
+        try {
+            await channel.send({embeds: [embed]})
+        } catch {
+            console.log(`^1JD_logs Error: ^2${client[args.client].user.tag}^0 Could not send message to ^2system^0 channel`)
+        }
         return 200
     } else {
         if(channels[args.channel].embed){
-            await channel.send({embeds: [embed]})
+            try {
+                await channel.send({embeds: [embed]})    
+            } catch {
+                console.log(`^1JD_logs Error: ^2${client[args.client].user.tag}^0 Could not send message to ^2${args.channel}^0 channel`)
+            }            
         } else {
-            await channel.send({content: args.msg})
+            try {
+                await channel.send({content: args.msg})    
+            } catch {
+                console.log(`^1JD_logs Error: ^2${client[args.client].user.tag}^0 could not send message to ^2${args.channel}^0 channel`)
+            }            
         }
         const guildAll = await client[channels['all'].client].guilds.cache.get(config.tokens[channels['all'].client].guildID);
         const all = guildAll.channels.cache.get(channels['all'].channelId);
         if(channels['all'].embed){
-            await all.send({embeds: [embed]})   
+            try {
+                await all.send({embeds: [embed]})   
+            } catch {
+                console.log(`^1JD_logs Error: ^2${client[args.client].user.tag}^0 Could not send message to ^2all^0 channel`)
+            }
         } else {
-            await all.send({content: args.msg})
+            try {
+                await all.send({content: args.msg})
+            } catch {
+                console.log(`^1JD_logs Error: ^2${client[args.client].user.tag}^0 Could not send message to ^2all^0 channel`)
+            }
         }
         return 200
     }

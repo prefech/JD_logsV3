@@ -84,10 +84,14 @@ RegisterCommand('screenshot', function(source, args, RawCommand)
 		TriggerEvent("JD_logsV3:ScreenshotCommand", args[1], 'Console')
 	else
 		if IsPlayerAceAllowed(source, cfgFile['screenshotPerms']) then
-			if args[1] == nil then
+			if args[1] == nil then				
 				return TriggerClientEvent('chat:addMessage', source, {color = {255, 0, 0}, args = {"JD_logsV3", "Please insert a target (use /screenshot id)"}})
 			end
-			TriggerEvent("JD_logsV3:ScreenshotCommand", args[1], GetPlayerName(source))
+			if GetPlayerPing(args[1]) ~= 0 then
+				TriggerEvent("JD_logsV3:ScreenshotCommand", args[1], GetPlayerName(source))
+			else
+				return TriggerClientEvent('chat:addMessage', source, {color = {255, 0, 0}, args = {"JD_logsV3", "There is no player online with id "..args[1]}})
+			end			
 		end
 	end
 end)
@@ -102,22 +106,22 @@ AddEventHandler("JD_logsV3:ScreenshotCommand", function(tId, src)
 	})
 end)
 
-AddEventHandler("playerJoining", function(source, oldID)
-	CreateLog({EmbedMessage = ("**%s** has joined the server."):format(GetPlayerName(source)), player_id = source, channel = 'join'})
-	TriggerClientEvent('Prefech:GetNotLogged', source, cfgFile['WeaponsNotLogged'])
-	local ids = ExtractIdentifiers(source)
+AddEventHandler("playerJoining", function(newID, oldID)
+	CreateLog({EmbedMessage = ("**%s** has joined the server."):format(GetPlayerName(newID)), player_id = newID, channel = 'join'})
+	TriggerClientEvent('Prefech:GetNotLogged', newID, cfgFile['WeaponsNotLogged'])
+	local ids = ExtractIdentifiers(newID)
 	local oldName = GetResourceKvpString("JD_logs:nameChane:"..ids.license)
 	if oldName == nil then
-		SetResourceKvp("JD_logs:nameChane:"..ids.license, GetPlayerName(source))
+		SetResourceKvp("JD_logs:nameChane:"..ids.license, GetPlayerName(newID))
 	else
-		if oldName ~= GetPlayerName(source) then
-			CreateLog({EmbedMessage = ("**Name Change Detected**\n`%s` :arrow_right: `%s`"):format(oldName, GetPlayerName(source)), player_id = source, channel = 'nameChange'})
-			SetResourceKvp("JD_logs:nameChane:"..ids.license, GetPlayerName(source))
+		if oldName ~= GetPlayerName(newID) then
+			CreateLog({EmbedMessage = ("**Name Change Detected**\n`%s` :arrow_right: `%s`"):format(oldName, GetPlayerName(newID)), player_id = newID, channel = 'nameChange'})
+			SetResourceKvp("JD_logs:nameChane:"..ids.license, GetPlayerName(newID))
 			for k,v in pairs(GetPlayers()) do
 				if IsPlayerAceAllowed(v, cfgFile['NameChangePerms']) then
 					TriggerClientEvent('chat:addMessage', i, {
 						template = '<div style="background-color: rgba(90, 90, 90, 0.9); text-align: center; border-radius: 0.5vh; padding: 0.7vh; font-size: 1.7vh;"><b>Player ^1{0} ^0{1} ^1{2}</b></div>',
-						args = { ("**Name Change Detected** `%s` -> `%s`"):format(GetPlayerName(source), oldName) }
+						args = { ("**Name Change Detected** `%s` -> `%s`"):format(GetPlayerName(newID), oldName) }
 					})
 				end
 			end
@@ -145,7 +149,8 @@ CreateThread(function()
 end)
 
 AddEventHandler('playerDropped', function(reason)
-	CreateLog({EmbedMessage = ("**%s** has left the server.\nReason: `%s`"):format(GetPlayerName(source), reason), player_id = source, channel = 'leave'})
+	local src = source
+	CreateLog({EmbedMessage = ("**%s** has left the server.\nReason: `%s`"):format(GetPlayerName(src), reason), player_id = src, channel = 'leave'})
 end)
 
 AddEventHandler('chatMessage', function(source, name, msg)
@@ -167,11 +172,6 @@ end)
 
 AddEventHandler('onResourceStop', function (resourceName)
 	CreateLog({EmbedMessage = ("`%s` has been stopped."):format(resourceName), channel = 'resource'})
-end)
-
-RegisterNetEvent('printDebug')
-AddEventHandler("printDebug", function(txt)
-	print('Debug'..txt)
 end)
 
 AddEventHandler('onResourceStart', function (resourceName)
@@ -210,7 +210,6 @@ AddEventHandler('Prefech:PlayerDamage', function(args)
 		elseif dType == 1 then
 			if IsPedAPlayer(cause) then
 				if GetVehiclePedIsIn(cause, false) ~= 0 then
-					print(GetVehiclePedIsIn(cause, false))
 					damageCause = GetPlayerName(getPlayerId(cause))..'(Vehicle)'
 				else 
 					damageCause = GetPlayerName(getPlayerId(cause))

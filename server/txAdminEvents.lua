@@ -1,9 +1,20 @@
+names = {}
+CreateThread(function()
+	while true do
+		Wait(1000)
+		for k,v in pairs(GetPlayers()) do
+			names[v] = GetPlayerName(v)
+		end
+	end
+end)
+
+
 AddEventHandler('txAdmin:events:scheduledRestart', function(data)
 	CreateLog({EmbedMessage = ("The server will restart in %s"):format(SecondsToClock(data.secondsRemaining)), channel = 'txAdmin'})
 end)
 
 AddEventHandler('txAdmin:events:playerKicked', function(data)
-	CreateLog({EmbedMessage = ("**%s** Kicked **%s**\nReason: `%s`"):format(data.author, GetPlayerName(data.target), data.reason), channel = 'txAdmin'})
+	CreateLog({EmbedMessage = ("**%s** Kicked **%s**\nReason: `%s`"):format(data.author, names[data.target], data.reason), channel = 'txAdmin'})
 end)
 
 AddEventHandler('txAdmin:events:playerWarned', function(data)
@@ -12,9 +23,9 @@ end)
 
 AddEventHandler('txAdmin:events:playerBanned', function(data)
 	if data.expiration == false then
-		CreateLog({EmbedMessage = ("**%s** Banned **%s**\nAction Id: `%s`\nReason: `%s`\nExpire: `Perm`"):format(data.author, GetPlayerName(data.target), data.actionId, data.reason), channel = 'txAdmin'})
+		CreateLog({EmbedMessage = ("**%s** Banned **%s**\nAction Id: `%s`\nReason: `%s`\nExpire: `Perm`"):format(data.author, names[data.target], data.actionId, data.reason), channel = 'txAdmin'})
 	else
-		CreateLog({EmbedMessage = ("**%s** Banned **%s**\nAction Id: `%s`\nReason: `%s`\nExpire: `%s`"):format(data.author, GetPlayerName(data.target), data.actionId, data.reason, data.expiration), channel = 'txAdmin'})
+		CreateLog({EmbedMessage = ("**%s** Banned **%s**\nAction Id: `%s`\nReason: `%s`\nExpire: `%s`"):format(data.author, names[data.target], data.actionId, data.reason, data.expiration), channel = 'txAdmin'})
 	end
 end)
 
