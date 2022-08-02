@@ -134,7 +134,7 @@ if(GetCurrentResourceName() !== GetInvokingResource()) return 505
             if(args.player_1['info'].steam && config.steamId){
                 disp = `${disp}\n:video_game: **Steam Hex:** ${args.player_1['info']['steam']['id']}`
             }
-            if(args.player_1['info']['steam'].url && config.steamURL){
+            if(args.player_1['info']['steam'].url && config.steamUrl){
                 disp = `${disp} **[Steam Profile](${args.player_1['info']['steam']['url']} "Open Steam Profile")**`
             }
             if(args.player_1['info'].license[0] && config.license){
