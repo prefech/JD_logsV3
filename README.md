@@ -1,7 +1,7 @@
 <h4 align="center">
 	<img src="https://img.shields.io/github/last-commit/Prefech/JD_logsV3">
 	<img src="https://img.shields.io/github/contributors/Prefech/JD_logsV3.png">
-	<a href="https://discord.gg/prefech" title=""><img alt="Discord Status" src="https://discordapp.com/api/guilds/721339695199682611/widget.png"></a>
+	<a href="https://prefech.com/discord" title=""><img alt="Discord Status" src="https://discordapp.com/api/guilds/721339695199682611/widget.png"></a>
 </h4>
 
 <div align="center">
@@ -20,7 +20,7 @@
     ·
     <a href="https://docs.prefech.com/jd_logsv3/">Documentation</a>
   </p>
-  <a href="https://discord.gg/prefech" title=""><img alt="Discord Invite" src="https://discordapp.com/api/guilds/721339695199682611/widget.png?style=banner2"></a>
+  <a href="https://prefech.com/discord" title=""><img alt="Discord Invite" src="https://discordapp.com/api/guilds/721339695199682611/widget.png?style=banner2"></a>
 </div>
 
 
