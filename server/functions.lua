@@ -129,20 +129,24 @@ end
 
 ServerFunc.CheckTimeout = function(data, cb) --[[ Function for optional check on member's timeout on discord. ]]
     if Config.CheckTimeout then
-        PerformHttpRequest('https://discord.com/api/v9/guilds/' .. Config.guildId .. '/members/' .. data.userId, function(err, text, headers)
-            local timestamp = json.decode(text).communication_disabled_until --[[ If the member has a timeout this value will hold the expire timestamp. ]]
-            if timestamp ~= nil then --[[ So when it is not nil the member has a timeout. ]]
-                local date = mysplit(mysplit(timestamp, 'T')[1], '-')
-                local time = mysplit(mysplit(mysplit(timestamp, 'T')[2], '.')[1], ':')
-                local expire = os.time({ year = date[1], month = date[2], day = date[3], hour = time[1], min = time[2], sec = time[3] })
-                local curTime = os.time(os.date("!*t"))
-                if expire > curTime then --[[ Checking if the expire time for the timeout was in the past since sometimes this value won't be removed when the timeout expires. ]]
-                    cb({state = true, expire = SecondsToClock(expire - curTime)}) --[[ User has a timeout confirmd that has not expired and we will send the info back to the event. ]]
+        PerformHttpRequest('https://discord.com/api/v9/guilds/' .. Config.guildId .. '0/members/' .. data.userId, function(err, text, headers)
+            if err == 200 then
+                local timestamp = json.decode(text).communication_disabled_until --[[ If the member has a timeout this value will hold the expire timestamp. ]]
+                if timestamp ~= nil then --[[ So when it is not nil the member has a timeout. ]]
+                    local date = mysplit(mysplit(timestamp, 'T')[1], '-')
+                    local time = mysplit(mysplit(mysplit(timestamp, 'T')[2], '.')[1], ':')
+                    local expire = os.time({ year = date[1], month = date[2], day = date[3], hour = time[1], min = time[2], sec = time[3] })
+                    local curTime = os.time(os.date("!*t"))
+                    if expire > curTime then --[[ Checking if the expire time for the timeout was in the past since sometimes this value won't be removed when the timeout expires. ]]
+                        cb({state = true, expire = SecondsToClock(expire - curTime)}) --[[ User has a timeout confirmd that has not expired and we will send the info back to the event. ]]
+                    else
+                        cb({state = false}) --[[ Timeout has expired and we will send that info back to the event. ]]
+                    end
                 else
-                    cb({state = false}) --[[ Timeout has expired and we will send that info back to the event. ]]
+                    cb({state = false}) --[[ Member does not have a timeout and we can send that info back to the event. ]]
                 end
             else
-                cb({state = false}) --[[ Member does not have a timeout and we can send that info back to the event. ]]
+                cb({state = false}) --[[ Unable to check timeout to letting them in the server. ]]
             end
         end, 'GET', '', {
             ['Content-Type'] = 'application/json',

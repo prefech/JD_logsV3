@@ -37,18 +37,18 @@ AddEventHandler("playerConnecting", function(name, setReason, deferrals)
 	ServerFunc.CreateLog({ EmbedMessage = lang.join.msg:gsub("{name}", GetPlayerName(src)), player_id = src, channel = 'join'})
 	deferrals.defer()
 	Wait(50)
-	if Config.CheckTimeout then
 	deferrals.update(lang.join.update)
-	ServerFunc.CheckTimeout({userId = ServerFunc.ExtractIdentifiers(src).discord:gsub("discord:", "")}, function(data)
-		Wait(100)
-		if not data.state then
-			deferrals.done()
-		else
-			ServerFunc.CreateLog({ EmbedMessage = lang.join.deny:gsub("{name}", GetPlayerName(src)):gsub("{expire}", data.expire), channel = 'leave', color = '#F23A3A'})
-			msg = lang.join.timeout:gsub("{expire}", data.expire)
-			deferrals.done(msg)
-		end
-	end)
+	if Config.CheckTimeout then
+		ServerFunc.CheckTimeout({userId = ServerFunc.ExtractIdentifiers(src).discord:gsub("discord:", "")}, function(data)
+			Wait(500)
+			if not data.state then
+				deferrals.done()
+			else
+				ServerFunc.CreateLog({ EmbedMessage = lang.join.deny:gsub("{name}", GetPlayerName(src)):gsub("{expire}", data.expire), channel = 'leave', color = '#F23A3A'})
+				msg = lang.join.timeout:gsub("{expire}", data.expire)
+				deferrals.done(msg)
+			end
+		end)
 	else
 		deferrals.done()
 	end

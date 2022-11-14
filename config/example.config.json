@@ -9,7 +9,7 @@
     "screenshotPerms": "jd.staff",
 
     "allLogs": true,
-    "CheckTimeout": true,
+    "CheckTimeout": false,
 
     "weaponLog": true,
     "damageLog": true,
