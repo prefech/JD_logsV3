@@ -244,7 +244,7 @@ exports('hasRole', function(src, roleid)
 	local ids = ServerFunc.ExtractIdentifiers(src)
 	ServerFunc.GetUser({ userId =  ids.discord:gsub("discord:", "")}, function(data)
 		for k,v in pairs(data.roles) do
-			if v = roleid then
+			if v == roleid then
 				return true
 			end
 		end
