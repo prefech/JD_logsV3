@@ -48,7 +48,7 @@
 ### 🔧 Download & Installation
 
 1. Download the latest version from [github](https://github.com/prefech/JD_logsV3/)
-  - Click the `Code` button and then `Download ZIP`
+  - Click the `Code` button and then `Download ZIP`  
   ![](https://prefech.com/i/424808e1-f68a-4af3-b697-5c7e8cd32290 "Clone Screen")
 2. Put the JD_logsV3 folder in the server resource directory
     - Make sure to rename the folder to JD_logsV3.
