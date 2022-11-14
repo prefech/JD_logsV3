@@ -3,7 +3,8 @@ module.exports = {
 	once: false,
 	async execute(message) {
         const {channel, content, guild, author} = message;
-		if(content.toLowerCase().startsWith(`${client[1].config.prefix}jdlogs delete`)){
+		if(content.toLowerCase().startsWith(`${client.config.prefix}delete`)){
+            message.react("✅");
             const tUser = await message.guild.members.cache.get(author.id);
 			if(!tUser.permissions.has("ADMINISTRATOR")) return message.reply({content: "⛔ | Missing Permissions to use this command.\nNeeded permission flag: `ADMINISTRATOR`"})
             const channels = JSON.parse(LoadResourceFile(GetCurrentResourceName(), '/config/channels.json'));

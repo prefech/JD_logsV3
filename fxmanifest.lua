@@ -13,7 +13,7 @@
 ]]
 
 
-version '3.0.4'
+version '3.1.0'
 author 'Prefech'
 description 'FXServer logs to Discord (https://prefech.com/)'
 repository 'https://github.com/prefech/JD_logsV3'
@@ -24,8 +24,10 @@ dependency 'screenshot-basic'
 
 -- Server Scripts
 server_scripts {
-    'server/playerDetails.lua',
+    'server/explisions.lua',
     'server/main.lua',
+    'server/functions.lua',
+    'server/commands.lua',
     'server/txAdminEvents.lua',
     'index.js'
 }
@@ -34,6 +36,10 @@ server_scripts {
 client_scripts {
     'client/clientTables.lua',
     'client/main.lua'
+}
+
+files {
+    'lang/*.json'
 }
 
 lua54 'yes'

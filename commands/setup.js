@@ -3,7 +3,8 @@ module.exports = {
 	once: false,
 	async execute(message) {
 		const {channel, content, guild, author} = message;
-		if(content.toLowerCase().startsWith(`${client[1].config.prefix}jdlogs setup`)){
+		if(content.toLowerCase().startsWith(`${client.config.prefix}setup`)){
+			message.react("✅");
 			const tUser = await message.guild.members.cache.get(author.id);
 			if(!tUser.permissions.has("ADMINISTRATOR")) return message.reply({content: "⛔ | Missing Permissions to use this command.\nNeeded permission flag: `ADMINISTRATOR`"})
 			const channels = JSON.parse(LoadResourceFile(GetCurrentResourceName(), '/config/channels.json'));
@@ -14,7 +15,7 @@ module.exports = {
 			info = {
 				"system": "🧾・system-messages"
 			}
-	
+
 			baselogs = {
 				"all": "📋・all-logs",
 				"chat": "💬・chat-logs",
@@ -26,14 +27,15 @@ module.exports = {
 				"resource": "🔧・resource-logs",
 				"nameChange": "💠・namechange-logs",
 				"explosion": "🧨・explosion-logs",
+				"permission": "🔒・permission-logs",
 				"txAdmin": "💻・txadmin-logs",
 				"screenshot": "📸・screenshot-logs"
 			}
-	
+
 			storage = {
 				"imageStore": "📦・screenshot-storage"
 			}
-	
+
 			x = await guild.channels.cache.find(cc => cc.name === `Information` && cc.type === 'GUILD_CATEGORY')
 			if(x){
 				if(!guild.channels.cache.find(cc => cc.name === `📢・prefech-announcements`)){
@@ -128,7 +130,7 @@ module.exports = {
 					}
 				})
 			}
-	
+
 			x = await guild.channels.cache.find(cc => cc.name === `Main Logs` && cc.type === 'GUILD_CATEGORY')
 			if(x){
 				for(const v in baselogs) {

@@ -3,11 +3,12 @@ module.exports = {
 	once: false,
 	async execute(message) {
 		const {channel, content, guild, author} = message;
-		if(content.toLowerCase().startsWith(`${client[1].config.prefix}jdlogs hide`)){
+		if(content.toLowerCase().startsWith(`${client.config.prefix}hide`)){
+			message.react("✅");
 			const tUser = await message.guild.members.cache.get(author.id);
 			if(!tUser.permissions.has("ADMINISTRATOR")) return message.reply({content: "⛔ | Missing Permissions to use this command.\nNeeded permission flag: `ADMINISTRATOR`"})
 			const args = content.split(" ")
-			if(!args[3]){ return message.reply(`Please use \`${client[1].config.prefix}jdlogs hide CHANNEL INPUT\`\nFor eaxmple: \`${client[1].config.prefix}jdlogs hide chat ip\``)}
+			if(!args[3]){ return message.reply(`Please use \`${client.config.prefix}hide CHANNEL INPUT\`\nFor eaxmple: \`${client.config.prefix}hide chat ip\``)}
 			let status = await GetResourceKvpString(`JD_logs:${(args[2])}:${args[3]}`)
 			if(status === "false" || status === null){
 				status = 'true'

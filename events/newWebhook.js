@@ -7,10 +7,10 @@ module.exports = {
         try {
             const channels = JSON.parse(LoadResourceFile(GetCurrentResourceName(), '/config/channels.json'));
             if(channels['imageStore'].channelId == ''){ return }
-            const guild = await client[1].guilds.cache.get(client[1].config.tokens[1].guildID)
-            const c = await guild.channels.cache.get(channels['imageStore'].channelId)
+            const c = await client.channels.cache.get(channels['imageStore'].channelId);
+            const guild = c.guild;
             if(!guild.me.permissions.has("MANAGE_WEBHOOKS")){ return }
-            if(c === undefined){ return }            
+            if(c === undefined){ return }
             const hooks = await guild.fetchWebhooks();
             await hooks.forEach(async webhook => {
                 if(webhook.channelId === c.id){
@@ -25,7 +25,9 @@ module.exports = {
 
             const newChannels = JSON.stringify(channels, null, 2)
             SaveResourceFile(GetCurrentResourceName(), '/config/channels.json', newChannels);
-            c.send({embeds: [new MessageEmbed().setTitle(`🧹・Webhook for Image store has been Reset!`)]})
+            if(client.config.WebhookResetMessage){
+                await c.send({embeds: [new MessageEmbed().setTitle(`🧹・Webhook for Image store has been Reset!`)]})
+            }
         } catch {
             console.log(`^1JD_logs Error: ^0Could not generate a new webhook.`)
         }

@@ -3,7 +3,7 @@ module.exports = {
 	once: false,
 	async execute(message) {
 		const {channel, content, guild, author} = message;
-		if(content.toLowerCase().startsWith(`${client[1].config.prefix}jdlogs create`)){
+		if(content.toLowerCase().startsWith(`${client.config.prefix}create`)){
 			const tUser = await message.guild.members.cache.get(author.id);
 			if(!tUser.permissions.has("ADMINISTRATOR")) return message.reply({content: "⛔ | Missing Permissions to use this command.\nNeeded permission flag: `ADMINISTRATOR`"})
 			const channels = JSON.parse(LoadResourceFile(GetCurrentResourceName(), '/config/channels.json'));
@@ -13,19 +13,16 @@ module.exports = {
 				"channelId": 0,
 				"icon": '',
 				"color": '',
-				"embed": true,
-				"client": 1
+				"embed": true
 			}
 			await question(message, 'name','What do you want to call the export channel?')
 			await question(message, 'icon','What icon do you want to use?')
 			await question(message, 'color','What hex color do you want to use?')
-			await question(message, 'client','What bot client do you want to use?')
 			channels[newChannel.name] = {
 				"channelId": 0,
 				"icon": newChannel.icon,
 				"color": newChannel.color,
-				"embed": true,
-				"client": Number(newChannel.client)
+				"embed": true
 			}
 			x = await guild.channels.cache.find(cc => cc.name === `Custom Logs` && cc.type === 'GUILD_CATEGORY')
 			nc = false
@@ -68,10 +65,10 @@ module.exports = {
 					const newChannels = JSON.stringify(channels)
 					SaveResourceFile(GetCurrentResourceName(), '/config/channels.json', newChannels);
 					let embed = new MessageEmbed()
-			.setTimestamp()
-			.setDescription(`**Details:**\n\n**Export Channel:** \`${newChannel.name}\`\n**Discord Channel Name:** \`#・${newChannel.name}-logs\` - \`${channels[newChannel.name].channelId}\`\n**Message Icon:** ${newChannel.icon}\n**Embed Color:** \`${newChannel.color}\`\n**Bot Client:** \`${newChannel.client}\``)
-			.setTitle("New Channel Created")
-			.addField("Export for channel:", `\`\`\`lua
+						.setTimestamp()
+						.setDescription(`**Details:**\n\n**Export Channel:** \`${newChannel.name}\`\n**Discord Channel Name:** \`#・${newChannel.name}-logs\` - \`${channels[newChannel.name].channelId}\`\n**Message Icon:** ${newChannel.icon}\n**Embed Color:** \`${newChannel.color}\``)
+						.setTitle("New Channel Created")
+						.addField("Export for channel:", `\`\`\`lua
 exports['${GetCurrentResourceName()}']:createLog({
 	EmbedMessage = "EMBED MESSAGE",
 	player_id = SERVER_ID_PLAYER_ONE,

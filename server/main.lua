@@ -1,237 +1,200 @@
-local channelsLoadFile = LoadResourceFile(GetCurrentResourceName(), "./config/channels.json")
-local channelFile = json.decode(channelsLoadFile)
-if channelFile == nil then
-	local temp = LoadResourceFile(GetCurrentResourceName(), "./config/example.channels.json")
-	local file = io.open(GetResourcePath(GetCurrentResourceName())..'/config/channels.json', 'w')
-	file:write(temp)
-	file:close()
-	channelsLoadFile = LoadResourceFile(GetCurrentResourceName(), "./config/channels.json")
-	channelFile = json.decode(channelsLoadFile)
-	print('^2Success: ^0We created a channels file for you.\n^1Note: Please Reatsrt JDlogs_V3 to continue.^0')
-end
+local configRawFile = LoadResourceFile(GetCurrentResourceName(), "./config/config.json")
+Config = json.decode(configRawFile)
+local channelRawFile = LoadResourceFile(GetCurrentResourceName(), "./config/channels.json")
+Channels = json.decode(channelRawFile)
+local langFile = LoadResourceFile(GetCurrentResourceName(), "./lang/" .. Config.language .. ".json")
+lang = json.decode(langFile)
 
-local configLoadFile = LoadResourceFile(GetCurrentResourceName(), "./config/config.json")
-local cfgFile = json.decode(configLoadFile)
-if cfgFile == nil then
-	local temp = LoadResourceFile(GetCurrentResourceName(), "./config/example.config.json")
-	local file = io.open(GetResourcePath(GetCurrentResourceName())..'/config/config.json', 'w')
-	file:write(temp)
-	file:close()
-	configLoadFile = LoadResourceFile(GetCurrentResourceName(), "./config/config.json")
-	cfgFile = json.decode(configLoadFile)
-	print('^2Success: ^0We created a config file for you.\n^1Note: Please Reatsrt JDlogs_V3 to continue.^0')
-end
+CreateThread(function() --[[ Permissions check for buildin DiscordAcePerms ]]
+	add_principal = true remove_principal = true addd_ace = true remove_ace = true
+	if not IsPrincipalAceAllowed('resource.' .. GetCurrentResourceName(), 'command.add_principal') then
+		print('^1Error:^0 JD_logs needs to have access to ^2add_principal^0 for the discord permissions to work.')
+		add_principal = false
+	end
+	if not IsPrincipalAceAllowed('resource.' .. GetCurrentResourceName(), 'command.remove_principal') then
+		print('^1Error:^0 JD_logs needs to have access to ^2remove_principal^0 for the discord permissions to work.')
+		remove_principal = false
+	end
+	if not IsPrincipalAceAllowed('resource.' .. GetCurrentResourceName(), 'command.add_ace') then
+		print('^1Error:^0 JD_logs needs to have access to ^2add_ace^0 for the discord permissions to work.')
+		addd_ace = false
+	end
+	if not IsPrincipalAceAllowed('resource.' .. GetCurrentResourceName(), 'command.remove_ace') then
+		print('^1Error:^0 JD_logs needs to have access to ^2remove_ace^0 for the discord permissions to work.')
+		remove_ace = false
+	end
+	if not add_principal or not remove_principal or not addd_ace or not remove_ace then
+		print('^1Error:^0 Make sure to add the following lines to your ^2server.cfg^0')
+		print('^3add_ace resource.' .. GetCurrentResourceName() .. ' command.add_principal allow^0')
+		print('^3add_ace resource.' .. GetCurrentResourceName() .. ' command.remove_principal allow^0')
+		print('^3add_ace resource.' .. GetCurrentResourceName() .. ' command.add_ace allow^0')
+		print('^3add_ace resource.' .. GetCurrentResourceName() .. ' command.remove_ace allow^0')
+	end
+end)
 
-CreateThread(function()
-	while true do
-		Wait(0)
-		if cfgFile.tokens ~= nil and channelFile.newInstall ~= nil then
-			if cfgFile['tokens']['1'].token == '' then
-				print('^1Error: You need to set at least one bot token.^0')
-			end
-			if channelFile['newInstall'] then
-				print('^2Please use the ^1!jdlogs setup ^2command on discord to finish the installation.^0')
-			end
-			break
+AddEventHandler("playerConnecting", function(name, setReason, deferrals)
+	local src = source
+	ServerFunc.CreateLog({ EmbedMessage = lang.join.msg:gsub("{name}", GetPlayerName(src)), player_id = src, channel = 'join'})
+	deferrals.defer()
+	Wait(50)
+	if Config.CheckTimeout then
+	deferrals.update(lang.join.update)
+	ServerFunc.CheckTimeout({userId = ServerFunc.ExtractIdentifiers(src).discord:gsub("discord:", "")}, function(data)
+		Wait(100)
+		if not data.state then
+			deferrals.done()
+		else
+			ServerFunc.CreateLog({ EmbedMessage = lang.join.deny:gsub("{name}", GetPlayerName(src)):gsub("{expire}", data.expire), channel = 'leave', color = '#F23A3A'})
+			msg = lang.join.timeout:gsub("{expire}", data.expire)
+			deferrals.done(msg)
 		end
-	end
-end)
-
-RegisterCommand('jdlogs', function(source, args, RawCommand)
-	if source == 0 then
-		if args[1]:lower() == "hide" then
-            if not args[3] then return print("^1Error: Please use 'jdlogs hide [channel] [object]'^0") end
-            if channelFile[args[2]:lower()] then
-                state = GetResourceKvpString("JD_logs:"..args[2]:lower()..":"..args[3]:lower())
-                if state == 'false' or state == nil then _state = 'true' else _state = 'false' end
-                SetResourceKvp("JD_logs:"..args[2]:lower()..":"..args[3]:lower(), _state)
-                print('^5[JD_logs]^1: Updated the hide status for '..args[2]:lower()..' ('..args[3]:lower()..') to: '.._state..'^0')
-            else
-                print("^1Error: Channel "..args[2]:lower().." does not exist. (Make sure to add it to your channels.json before using this command.)^0")
-            end
-        end
-	end
-end)
-
-exports('discord', function(msg, player_1, player_2, color, channel)
-	args ={
-		['EmbedMessage'] = msg,
-		['color'] = color,
-		['channel'] = channel
-	}
-	if player_1 ~= 0 then
-		args['player_id'] = player_1
-	end
-	if player_2 ~= 0 then
-		args['player_2_id'] = player_2
-	end
-	CreateLog(args)
-end)
-
-exports('createLog', function(args)
-	CreateLog(args)
-end)
-
-exports('GetPlayers', function(args)
-	return GetPlayers()
-end)
-
-RegisterCommand('screenshot', function(source, args, RawCommand)
-	if source == 0 then
-		if args[1] == nil then
-			return console.log('^1JD_logs Error:^0 Please insert a target (1 argument expected got nil)')
-		end
-		TriggerEvent("JD_logsV3:ScreenshotCommand", args[1], 'Console')
+	end)
 	else
-		if IsPlayerAceAllowed(source, cfgFile['screenshotPerms']) then
-			if args[1] == nil then				
-				return TriggerClientEvent('chat:addMessage', source, {color = {255, 0, 0}, args = {"JD_logsV3", "Please insert a target (use /screenshot id)"}})
-			end
-			if GetPlayerPing(args[1]) ~= 0 then
-				TriggerEvent("JD_logsV3:ScreenshotCommand", args[1], GetPlayerName(source))
-			else
-				return TriggerClientEvent('chat:addMessage', source, {color = {255, 0, 0}, args = {"JD_logsV3", "There is no player online with id "..args[1]}})
-			end			
-		end
+		deferrals.done()
 	end
 end)
 
-RegisterNetEvent("JD_logsV3:ScreenshotCommand")
-AddEventHandler("JD_logsV3:ScreenshotCommand", function(tId, src)
-	CreateLog({
-		EmbedMessage = "**Screenshot of:** `"..GetPlayerName(tId).."`\n**Requested by:** `"..src.."`",
-		player_id = tId,
-		channel = "screenshot",
-		screenshot = true
-	})
+AddEventHandler('playerDropped', function(reason)
+	local src = source
+	ServerFunc.CreateLog({EmbedMessage = lang.leave.msg:gsub("{name}", GetPlayerName(src)):gsub("{reason}", reason), player_id = src, channel = 'leave'})
 end)
 
-AddEventHandler("playerJoining", function(newID, oldID)
-	CreateLog({EmbedMessage = ("**%s** has joined the server."):format(GetPlayerName(newID)), player_id = newID, channel = 'join'})
-	TriggerClientEvent('Prefech:GetNotLogged', newID, cfgFile['WeaponsNotLogged'])
-	local ids = ExtractIdentifiers(newID)
+AddEventHandler('chatMessage', function(source, name, msg)
+	local src = source
+	if msg:sub(1, 1) ~= '/' then
+		ServerFunc.CreateLog({EmbedMessage = lang.chat.msg:gsub("{name}", GetPlayerName(src)):gsub("{msg}", msg), player_id = src, channel = 'chat'})
+	end
+end)
+
+AddEventHandler('onResourceStart', function (resourceName)
+	Wait(100)
+	ServerFunc.CreateLog({EmbedMessage = lang.resource.start_msg:gsub("{resource}", resourceName), channel = 'resource'})
+end)
+
+AddEventHandler('onResourceStop', function (resourceName)
+	ServerFunc.CreateLog({EmbedMessage = lang.resource.stop_msg:gsub("{resource}", resourceName), channel = 'resource'})
+end)
+
+local explosionTypes = {'GRENADE', 'GRENADELAUNCHER', 'STICKYBOMB', 'MOLOTOV', 'ROCKET', 'TANKSHELL', 'HI_OCTANE', 'CAR', 'PLANE', 'PETROL_PUMP', 'BIKE', 'DIR_STEAM', 'DIR_FLAME', 'DIR_GAS_CANISTER', 'BOAT', 'SHIP_DESTROY', 'TRUCK', 'BULLET', 'SMOKEGRENADELAUNCHER', 'SMOKEGRENADE', 'BZGAS', 'FLARE', 'GAS_CANISTER', 'EXTINGUISHER', 'PROGRAMMABLEAR', 'TRAIN', 'BARREL', 'PROPANE', 'BLIMP', 'DIR_FLAME_EXPLODE', 'TANKER', 'PLANE_ROCKET', 'VEHICLE_BULLET', 'GAS_TANK', 'BIRD_CRAP', 'RAILGUN', 'BLIMP2', 'FIREWORK', 'SNOWBALL', 'PROXMINE', 'VALKYRIE_CANNON', 'AIR_DEFENCE', 'PIPEBOMB', 'VEHICLEMINE', 'EXPLOSIVEAMMO', 'APCSHELL', 'BOMB_CLUSTER', 'BOMB_GAS', 'BOMB_INCENDIARY', 'BOMB_STANDARD', 'TORPEDO', 'TORPEDO_UNDERWATER', 'BOMBUSHKA_CANNON', 'BOMB_CLUSTER_SECONDARY', 'HUNTER_BARRAGE', 'HUNTER_CANNON', 'ROGUE_CANNON', 'MINE_UNDERWATER', 'ORBITAL_CANNON', 'BOMB_STANDARD_WIDE', 'EXPLOSIVEAMMO_SHOTGUN', 'OPPRESSOR2_CANNON', 'MORTAR_KINETIC', 'VEHICLEMINE_KINETIC', 'VEHICLEMINE_EMP', 'VEHICLEMINE_SPIKE', 'VEHICLEMINE_SLICK', 'VEHICLEMINE_TAR', 'SCRIPT_DRONE', 'RAYGUN', 'BURIEDMINE', 'SCRIPT_MISSIL'}
+AddEventHandler('explosionEvent', function(source, ev)
+	local src = source
+    if ev.explosionType < -1 or ev.explosionType > 77 then
+        ev.explosionType = 'UNKNOWN'
+    else
+        ev.explosionType = ServerExplotions.ExplotionNames[explosionTypes[ev.explosionType + 1]]
+    end
+    ServerFunc.CreateLog({EmbedMessage = lang.explosion.msg:gsub("{name}", GetPlayerName(src)):gsub("{type}", ev.explosionType), player_id = src, channel = 'explosion'})
+end)
+
+AddEventHandler("playerJoining", function(newID, oldID) --[[ Name Change Logs / Discord Ace Perms. ]]
+	local ids = ServerFunc.ExtractIdentifiers(newID)
 	local oldName = GetResourceKvpString("JD_logs:nameChane:"..ids.license)
 	if oldName == nil then
 		SetResourceKvp("JD_logs:nameChane:"..ids.license, GetPlayerName(newID))
 	else
 		if oldName ~= GetPlayerName(newID) then
-			CreateLog({EmbedMessage = ("**Name Change Detected**\n`%s` :arrow_right: `%s`"):format(oldName, GetPlayerName(newID)), player_id = newID, channel = 'nameChange'})
+			ServerFunc.CreateLog({EmbedMessage = lang.nameChange.msg:gsub("{old_name}", oldName):gsub("{new_name}", GetPlayerName(newID)), player_id = newID, channel = 'nameChange'})
 			SetResourceKvp("JD_logs:nameChane:"..ids.license, GetPlayerName(newID))
 			for k,v in pairs(GetPlayers()) do
-				if IsPlayerAceAllowed(v, cfgFile['NameChangePerms']) then
+				if IsPlayerAceAllowed(v, Config.NameChangePerms) then
 					TriggerClientEvent('chat:addMessage', i, {
 						template = '<div style="background-color: rgba(90, 90, 90, 0.9); text-align: center; border-radius: 0.5vh; padding: 0.7vh; font-size: 1.7vh;"><b>Player ^1{0} ^0{1} ^1{2}</b></div>',
-						args = { ("**Name Change Detected** `%s` -> `%s`"):format(GetPlayerName(newID), oldName) }
+						args = { lang.nameChange.game_msg:gsub("{old_name}", oldName):gsub("{new_name}", GetPlayerName(newID)) }
 					})
 				end
 			end
 		end
 	end
-end)
-
-CreateThread(function()
-	local current = GetResourceMetadata(GetCurrentResourceName(), 'version')
-	PerformHttpRequest('https://raw.githubusercontent.com/Prefech/JD_logsV3/master/json/version.json', function(code, res, headers)
-		if code == 200 then
-			local rv = json.decode(res)
-			SetConvarServerInfo("JD_logs", "V"..current)
-			if rv.version ~= current then
-				print('^5[JD_logs] ^1Error: ^0JD_logsV3 is outdated and you will no longer get support for this version.')
-			end
+	local groups = ''
+	local perms = ''
+	ServerFunc.GetUser({ userId =  ids.discord:gsub("discord:", "")}, function(data)
+		for k, v in pairs(Config.DiscordAcePerms) do
+			ServerFunc.has_val(data.roles, k, function(resp)
+				if resp then
+					if v.groups then
+						for _, group in pairs(v.groups) do
+							ExecuteCommand('add_principal identifier.' .. ids.license .. ' ' .. group)
+							groups = groups .. '\n`👥` • '.. group:gsub("group.", "")
+						end
+					end
+					if v.perms then
+						for _, perm in pairs(v.perms) do
+							ExecuteCommand('add_ace identifier.' .. ids.license .. ' ' .. perm .. ' allow')
+							perms = perms .. '\n`🔒` • '.. perm
+						end
+					end
+				end
+			end)
 		end
-	end, 'GET')
-	Wait(10 * 1000)
-	SetResourceKvp("JD_logs:LastVersion", current) -- This KVP is used for making the correct changes to config files when updating to the latest version.
+		if groups ~= '' or perms ~= '' then
+			if groups == '' then groups = 'N/A' end
+			if perms == '' then perms = 'N/A' end
+			ServerFunc.CreateLog({EmbedMessage = lang.permission.msg:gsub("{name}", GetPlayerName(newID)), player_id = newID, channel = 'permission', fields = { { name = 'Groups:', value = groups, inline = true }, { name = 'Permissions:', value = perms, inline = true } } })
+		end
+	end)
 end)
 
-CreateThread(function()
-	TriggerClientEvent('Prefech:GetNotLogged', -1, cfgFile['WeaponsNotLogged']) -- Just sync the table in case of resource restart.
+RegisterNetEvent("Prefech:JD_logsV3:GetConfigSettings")
+AddEventHandler("Prefech:JD_logsV3:GetConfigSettings", function()
+	data = {
+		weaponLog = Config.weaponLog,
+		WeaponsNotLogged = Config.WeaponsNotLogged,
+		language = Config.language,
+		damageLog = Config.damageLog,
+		deathLog = Config.deathLog
+	}
+	TriggerClientEvent("Prefech:JD_logsV3:SendConfigSettings", source, data)
 end)
 
-AddEventHandler('playerDropped', function(reason)
-	local src = source
-	CreateLog({EmbedMessage = ("**%s** has left the server.\nReason: `%s`"):format(GetPlayerName(src), reason), player_id = src, channel = 'leave'})
-end)
-
-AddEventHandler('chatMessage', function(source, name, msg)
-    local _source = source
-    if msg:sub(1, 1) ~= '/' then
-        CreateLog({ channel = 'chat', EmbedMessage = ('**%s:** `%s`'):format(GetPlayerName(_source), msg), player_id = _source })
+RegisterServerEvent('Prefech:JD_logsV3:playerShotWeapon') --[[ Shooting logs. ]]
+AddEventHandler('Prefech:JD_logsV3:playerShotWeapon', function(weapon, count)
+	if Config.weaponLog then
+		ServerFunc.CreateLog({EmbedMessage = lang.shooting.msg:gsub("{name}", GetPlayerName(source)):gsub("{weapon}", weapon):gsub("{count}", count), player_id = source, channel = 'shooting'})
     end
 end)
 
-AddEventHandler('explosionEvent', function(source, ev)
-    local explosionTypes = {'GRENADE', 'GRENADELAUNCHER', 'STICKYBOMB', 'MOLOTOV', 'ROCKET', 'TANKSHELL', 'HI_OCTANE', 'CAR', 'PLANE', 'PETROL_PUMP', 'BIKE', 'DIR_STEAM', 'DIR_FLAME', 'DIR_GAS_CANISTER', 'BOAT', 'SHIP_DESTROY', 'TRUCK', 'BULLET', 'SMOKEGRENADELAUNCHER', 'SMOKEGRENADE', 'BZGAS', 'FLARE', 'GAS_CANISTER', 'EXTINGUISHER', 'PROGRAMMABLEAR', 'TRAIN', 'BARREL', 'PROPANE', 'BLIMP', 'DIR_FLAME_EXPLODE', 'TANKER', 'PLANE_ROCKET', 'VEHICLE_BULLET', 'GAS_TANK', 'BIRD_CRAP', 'RAILGUN', 'BLIMP2', 'FIREWORK', 'SNOWBALL', 'PROXMINE', 'VALKYRIE_CANNON', 'AIR_DEFENCE', 'PIPEBOMB', 'VEHICLEMINE', 'EXPLOSIVEAMMO', 'APCSHELL', 'BOMB_CLUSTER', 'BOMB_GAS', 'BOMB_INCENDIARY', 'BOMB_STANDARD', 'TORPEDO', 'TORPEDO_UNDERWATER', 'BOMBUSHKA_CANNON', 'BOMB_CLUSTER_SECONDARY', 'HUNTER_BARRAGE', 'HUNTER_CANNON', 'ROGUE_CANNON', 'MINE_UNDERWATER', 'ORBITAL_CANNON', 'BOMB_STANDARD_WIDE', 'EXPLOSIVEAMMO_SHOTGUN', 'OPPRESSOR2_CANNON', 'MORTAR_KINETIC', 'VEHICLEMINE_KINETIC', 'VEHICLEMINE_EMP', 'VEHICLEMINE_SPIKE', 'VEHICLEMINE_SLICK', 'VEHICLEMINE_TAR', 'SCRIPT_DRONE', 'RAYGUN', 'BURIEDMINE', 'SCRIPT_MISSIL'}
-    if ev.explosionType < -1 or ev.explosionType > 77 then
-        ev.explosionType = 'UNKNOWN'
-    else
-        ev.explosionType = explosionTypes[ev.explosionType + 1]
-    end
-    CreateLog({EmbedMessage = ("**%s** created an explotion: `%s`"):format(GetPlayerName(source), ev.explosionType), player_id = source, channel = 'explosion'})
-end)
-
-AddEventHandler('onResourceStop', function (resourceName)
-	CreateLog({EmbedMessage = ("`%s` has been stopped."):format(resourceName), channel = 'resource'})
-end)
-
-AddEventHandler('onResourceStart', function (resourceName)
-    Wait(100)
-	CreateLog({EmbedMessage = ("`%s` has been started."):format(resourceName), channel = 'resource'})
-end)
-
-RegisterServerEvent('Prefech:playerDied')
-AddEventHandler('Prefech:playerDied',function(args)
+RegisterServerEvent('Prefech:JD_logsV3:playerDied')
+AddEventHandler('Prefech:JD_logsV3:playerDied',function(args)
 	if args.kil == 0 then
-		CreateLog({EmbedMessage = args.rsn, player_id = source, channel = 'death'})
+		ServerFunc.CreateLog({EmbedMessage = args.rsn, player_id = source, channel = 'death'})
 	else
-		CreateLog({EmbedMessage = args.rsn, player_id = source, player_2_id = args.kil, channel = 'death'})
+		ServerFunc.CreateLog({EmbedMessage = args.rsn, player_id = source, player_2_id = args.kil, channel = 'death'})
 	end
 end)
 
-RegisterServerEvent('Prefech:playerShotWeapon')
-AddEventHandler('Prefech:playerShotWeapon', function(weapon, count)
-	if cfgFile['weaponLog'] then
-		if count ~= nil then
-    		CreateLog({EmbedMessage = ("**%s** fired a **%s** `%s time(s)`."):format(GetPlayerName(source), weapon, count), player_id = source, channel = 'shooting'})
-		else
-			CreateLog({EmbedMessage = ("**%s** fired a **%s**."):format(GetPlayerName(source), weapon, count), player_id = source, channel = 'shooting'})
-		end
-	end
-end)
-
-RegisterServerEvent('Prefech:PlayerDamage')
-AddEventHandler('Prefech:PlayerDamage', function(args)
-	if cfgFile['damageLog'] then
+RegisterServerEvent('Prefech:JD_logsV3:PlayerDamage') --[[ Damaghe Logs. ]]
+AddEventHandler('Prefech:JD_logsV3:PlayerDamage', function(args)
+	if Config.damageLog then
 		iPed = GetPlayerPed(source)
 		cause = GetPedSourceOfDamage(iPed)
 		dType = GetEntityType(cause)
 		if dType == 0 then
-			damageCause = 'themselfs'
+			damageCause = lang.damage.type.self
 		elseif dType == 1 then
 			if IsPedAPlayer(cause) then
 				if GetVehiclePedIsIn(cause, false) ~= 0 then
-					damageCause = GetPlayerName(getPlayerId(cause))..'(Vehicle)'
-				else 
-					damageCause = GetPlayerName(getPlayerId(cause))
+					damageCause = lang.damage.type.player_veh:gsub("{name}", GetPlayerName(getPlayerId(cause)))
+				else
+					damageCause = lang.damage.type.player:gsub("{name}", GetPlayerName(getPlayerId(cause)))
 				end
 			else
 				if GetVehiclePedIsIn(cause, false) ~= 0 then
-					damageCause = 'AI (Vehicle)'
-				else 
-					damageCause = 'AI'
+					damageCause = lang.damage.type.ai_veh
+				else
+					damageCause = lang.damage.type.ai
 				end
 			end
 		elseif dType == 2 then
 			driver = GetPedInVehicleSeat(cause, -1)
 			if IsPedAPlayer(driver) then
-				damageCause = GetPlayerName(cause)..' with a vehicle'
+				damageCause = lang.damage.type.player_veh:gsub("{name}", GetPlayerName(cause))
 			else
-				damageCause = 'a vehicle'
-			end			
+				damageCause = lang.damage.type.veh
+			end
 		elseif dType == 3 then
-			damageCause = 'a object'
+			damageCause = lang.damage.type.obj
 		end
-		CreateLog({EmbedMessage = ("**%s** Has been damaged by `%s` and lost `%s` health"):format(GetPlayerName(source), damageCause, args), player_id = source, channel = 'damage'})
+		ServerFunc.CreateLog({EmbedMessage = lang.damage.msg:gsub("{name}", GetPlayerName(source)):gsub("{type}", damageCause):gsub("{health}", args), player_id = source, channel = 'damage'})
 	end
 end)
 
@@ -243,17 +206,58 @@ function getPlayerId(ped)
 	end
 end
 
-RegisterNetEvent("Prefech:ScreenshotCB")
-AddEventHandler("Prefech:ScreenshotCB", function(args)
-	CreateLog(args)
+--[[ Export from client side. ]]
+RegisterServerEvent('Prefech:JD_logsV3:ClientDiscord')
+AddEventHandler('Prefech:JD_logsV3:ClientDiscord', function(args)
+	ServerFunc.CreateLog(args)
 end)
 
-RegisterServerEvent('Prefech:ClientDiscord')
-AddEventHandler('Prefech:ClientDiscord', function(args)
-	CreateLog(args)
+--[[ Exports from server side ]]
+--[[ Exports ]]
+exports('discord', function(msg, player_1, player_2, color, channel) --[[ This is to support the export from v1. ]]
+	args ={
+		['EmbedMessage'] = msg,
+		['color'] = color,
+		['channel'] = channel
+	}
+	if player_1 ~= 0 then
+		args['player_id'] = player_1
+	end
+	if player_2 ~= 0 then
+		args['player_2_id'] = player_2
+	end
+	ServerFunc.CreateLog(args)
 end)
 
-CreateThread(function()
+exports('createLog', function(args) --[[ and this is the new export with all new stuff. ]]
+	ServerFunc.CreateLog(args)
+end)
+
+exports('getRoles', function(src)
+	local ids = ServerFunc.ExtractIdentifiers(src)
+	ServerFunc.GetUser({ userId =  ids.discord:gsub("discord:", "")}, function(data)
+		return data.roles
+	end)
+end)
+
+exports('hasRole', function(src, roleid)
+	local ids = ServerFunc.ExtractIdentifiers(src)
+	ServerFunc.GetUser({ userId =  ids.discord:gsub("discord:", "")}, function(data)
+		for k,v in pairs(data.roles) do
+			if v = roleid then
+				return true
+			end
+		end
+		return false
+	end)
+end)
+
+RegisterNetEvent("Prefech:JD_logsV3:ScreenshotCB") --[[ Returning screenshot value. ]]
+AddEventHandler("Prefech:JD_logsV3:ScreenshotCB", function(args)
+	ServerFunc.CreateLog(args)
+end)
+
+CreateThread(function() --[[ System Messages. ]]
     while true do
         PerformHttpRequest('https://api.prefech.dev/v1/fivem/jdlogs/systemMsg', function(code, res, headers)
             if code == 200 then
@@ -262,7 +266,7 @@ CreateThread(function()
 					if os.time(os.date("!*t")) - tonumber(rv.item.date) < (7 * 24 * 60 * 60) then
 						if GetResourceKvpString('JD_logs:SystemMessage') ~= rv.item.message then
 							print('^1JD_logs System Message\n^1--------------------^0\n^2'..rv.item.title..'^0\n'..rv.item.message..'\n^1--------------------^0')
-							CreateLog({ EmbedMessage = '**'..rv.item.title..'**\n'..rv.item.message, channel = 'system'})
+							ServerFunc.CreateLog({ EmbedMessage = '**'..rv.item.title..'**\n'..rv.item.message, channel = 'system'})
 						end
 					end
 					SetResourceKvp("JD_logs:SystemMessageId", ''..rv.item.id..'')
@@ -277,86 +281,38 @@ CreateThread(function()
     end
 end)
 
-local storage = nil
-RegisterNetEvent('Prefech:sendClientLogStorage')
-AddEventHandler('Prefech:sendClientLogStorage', function(_storage)
-	storage = _storage
-end)
-
-function CreateLog(args)
-	if channelFile[args.channel] == nil then return print('^1Error: Could not find channel: ^2'..args.channel..'^0' ) end
-    if args.screenshot then
-        if not args.player_id then
-            print('can not make a screenshot if there is no know player id.')
-        else
-			local channelsLoadFile = LoadResourceFile(GetCurrentResourceName(), "./config/channels.json")
-			local theFile = json.decode(channelsLoadFile)
-            args['url'] = theFile['imageStore'].webhookID.."/"..theFile['imageStore'].webhookToken
-            return TriggerClientEvent('Prefech:ClientCreateScreenshot', args.player_id, args)
-        end
-    end
-    info = {
-        channel = args.channel
-    }
-
-	if args.EmbedMessage ~= nil then
-		info.msg = args.EmbedMessage
-	end
-
-    if args.player_id ~= nil then
-        info.player_1 = {
-            title = "Player Details: "..GetPlayerName(args.player_id),
-            info = GetPlayerDetails(args.player_id, args.channel)
-        }
-    end
-
-    if args.player_2_id  ~= nil then
-        info.player_2 = {
-            title = "Player Details: "..GetPlayerName(args.player_2_id),
-            info = GetPlayerDetails(args.player_2_id, args.channel)
-        }
-    end
-
-	if args.fields ~= nil then
-		if #args.fields	<= 23 then
-			info.fields = {};
-			for k,v in pairs(args.fields) do
-				table.insert( info.fields, {
-					['name'] = v.name,
-					['value'] = v.text,
-					['inline'] = v.inline
-				})
-			end
-		end
-	end
-
-    if args.imageUrl then
-        info.imageUrl = args.imageUrl;
-    end
-    if channelFile[args.channel].client then
-        info.client = channelFile[args.channel].client
-    else
-        info.client = 1
-    end
-
-    exports[GetCurrentResourceName()]:sendEmbed(info)
-end
-
--- version check
-CreateThread( function()
+CreateThread( function() --[[ Version Checker ]]
 	local version = GetResourceMetadata(GetCurrentResourceName(), 'version')
 	SetConvarServerInfo("JD_logs", "V"..version)
 	PerformHttpRequest('https://raw.githubusercontent.com/Prefech/JD_logsV3/master/json/version.json', function(code, res, headers)
 		if code == 200 then
 			local rv = json.decode(res)
-			if rv.version ~= version then
+			if tonumber(table.concat(mysplit(rv.version, "."))) > tonumber(table.concat(mysplit(version, "."))) then
 					print(([[^1-------------------------------------------------------
 					JD_logsV3
 UPDATE: %s AVAILABLE
 CHANGELOG: %s
 -------------------------------------------------------^0]]):format(rv.version, rv.changelog))
-				CreateLog({ EmbedMessage = "**JD_logsV3 Update V"..rv.version.."**\nDownload the latest update of JD_logsV3 here:\nhttps://github.com/prefech/JD_logsV3/\n\n**Changelog:**\n"..rv.changelog..'\n\n**How to update?**\n1. Download the latest version.\n2. Replace all files with your old once **EXCEPT KEEP THE CONFIG** folder.\n3. run the `!jdlogs setup` command again and you\'re done.', channel = 'system'})
+				ServerFunc.CreateLog({ EmbedMessage = "**JD_logsV3 Update V"..rv.version.."**\nDownload the latest update of JD_logsV3 here:\nhttps://github.com/prefech/JD_logsV3/\n\n**Changelog:**\n"..rv.changelog..'\n\n**How to update?**\n1. Download the latest version.\n2. Replace all files with your old once **EXCEPT THE CONFIG** folder.\n3. run the `!jdlogs setup` command again and you\'re done.', channel = 'system'})
 			end
 		end
 	end, 'GET')
 end)
+
+--[[
+
+All options for the export.
+
+exports.JD_logsV3:createLog({
+    EmbedMessage = "Embed Message", -- The Embed Message you want to show in the export.
+    player_id = SERVER_ID_PLAYER_ONE, -- Server id for the first player (Optional)
+    player_2_id = SERVER_ID_PLAYER_TWO, -- Server if for the second player (Optional)
+    channel = "Channel name from channels.json | Discord Channel ID | Discord Webhook URL", -- You have 3 options here.
+    screenshot = true, -- Make a screenshot of the first player (Optional)
+	screenshot_2 = true, -- Make a screenshot of the second player (Optional)
+	title = 'Custom Title', -- Set a custom title for this export (Optional)
+	color = '#A1A1A1', -- Set a custom color for this export (Optional)
+	icon = '✅' -- Set a custom icon for this export (Requires Custom Title) (Optional)
+})
+
+]]

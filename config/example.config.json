@@ -1,39 +1,53 @@
 {
-    "prefix":"!",
-    "tokens": {
-        "1":{
-            "token": "",
-            "guildID": "",
-            "_Note": "YOU NEED TO HAVE AT LEAST 2 BOT TOKENS!"
-        },
-        "2":{
-            "token": "",
-            "guildID": "",
-            "_Note": "YOU NEED TO HAVE AT LEAST 2 DIFFERENT BOT TOKENS!"
-        }
-    },
+    "prefix":"!jdlogs ",
+    "token": "",
+    "guildId": "",
+    "TimezoneOffset": "+00:00",
+    "language": "en",
 
     "NameChangePerms": "jd.staff",
-    "screenshotPerms": "jd.staff",    
+    "screenshotPerms": "jd.staff",
 
     "allLogs": true,
+    "CheckTimeout": true,
+
     "weaponLog": true,
     "damageLog": true,
+    "deathLog": true,
 
     "playerId": true,
     "postals": true,
     "playerHealth": true,
     "playerArmor": true,
-    "discordId": true,
-    "ip": true,
     "playerPing": true,
-    "steamId": true,
+
+    "ip": true,
     "steamUrl": true,
-    "license": true,
+    "discordId": {
+        "enabled": true,
+        "spoiler": true
+    },
+    "steamId": {
+        "enabled": true,
+        "spoiler": true
+    },
+    "license": {
+        "enabled": true,
+        "spoiler": true
+    },
+
+    "WebhookResetMessage": false,
 
     "WeaponsNotLogged": [
         "WEAPON_SNOWBALL",
         "WEAPON_FIREEXTINGUISHER",
         "WEAPON_PETROLCAN"
-    ]
+    ],
+
+    "DiscordAcePerms": {
+        "DISCORD_ROLE_ID": {
+            "groups": ["group.admin", "group.mod", "any more you want to give"],
+            "perms": ["jd.staff", "same as groups but then for single permissions."]
+        }
+    }
 }

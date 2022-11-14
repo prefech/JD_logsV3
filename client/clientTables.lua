@@ -1,18 +1,3 @@
---[[
-    #####################################################################
-    #                _____           __          _                      #
-    #               |  __ \         / _|        | |                     #
-    #               | |__) | __ ___| |_ ___  ___| |__                   #
-    #               |  ___/ '__/ _ \  _/ _ \/ __| '_ \                  #
-    #               | |   | | |  __/ ||  __/ (__| | | |                 #
-    #               |_|   |_|  \___|_| \___|\___|_| |_|                 #
-    #                                                                   #
-    #                 JD_logs By Prefech 01-11-2021                     #
-    #                         www.prefech.com                           #
-    #                                                                   #
-    #####################################################################
-]]
-
 ClientTables = {}
 
 ClientTables.WeaponNames = {
@@ -198,7 +183,7 @@ ClientTables.deatCause = {
 	[GetHashKey('WEAPON_PUMPSHOTGUN')] = {'Pulverized', 'Pump Shotgun'},
 	[GetHashKey('WEAPON_HEAVYSHOTGUN')] = {'Pulverized', 'Heavy Shotgun'},
 	[GetHashKey('WEAPON_SAWNOFFSHOTGUN')] = {'Pulverized', 'Sawnoff Shotgun'},
-	
+
 	[GetHashKey('WEAPON_MARKSMANRIFLE')] = {'Sniped', 'Marksman Rifle'},
 	[GetHashKey('WEAPON_SNIPERRIFLE')] = {'Sniped', 'Sniper Rifle'},
 	[GetHashKey('WEAPON_HEAVYSNIPER')] = {'Sniped', 'Heavy Sniper'},
@@ -220,7 +205,7 @@ ClientTables.deatCause = {
 	[GetHashKey('WEAPON_PIPEBOMB')] = {'Bombed', 'Pipe Bomb'},
 
 	[GetHashKey('VEHICLE_WEAPON_ROTORS')] = {'Mowed Over', 'Helicopter Rotors'},
-	
+
 	[GetHashKey('WEAPON_RUN_OVER_BY_CAR')] = {'Flattened', 'Vehicle'},
 	[GetHashKey('WEAPON_RAMMED_BY_CAR')] = {'Flattened', 'Vehicle'},
 
