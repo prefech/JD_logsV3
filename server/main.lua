@@ -108,28 +108,30 @@ AddEventHandler("playerJoining", function(newID, oldID) --[[ Name Change Logs / 
 	local groups = ''
 	local perms = ''
 	ServerFunc.GetUser({ userId =  ids.discord:gsub("discord:", "")}, function(data)
-		for k, v in pairs(Config.DiscordAcePerms) do
-			ServerFunc.has_val(data.roles, k, function(resp)
-				if resp then
-					if v.groups then
-						for _, group in pairs(v.groups) do
-							ExecuteCommand('add_principal identifier.' .. ids.license .. ' ' .. group)
-							groups = groups .. '\n`👥` • '.. group:gsub("group.", "")
+		if data then
+			for k, v in pairs(Config.DiscordAcePerms) do
+				ServerFunc.has_val(data.roles, k, function(resp)
+					if resp then
+						if v.groups then
+							for _, group in pairs(v.groups) do
+								ExecuteCommand('add_principal identifier.' .. ids.license .. ' ' .. group)
+								groups = groups .. '\n`👥` • '.. group:gsub("group.", "")
+							end
+						end
+						if v.perms then
+							for _, perm in pairs(v.perms) do
+								ExecuteCommand('add_ace identifier.' .. ids.license .. ' ' .. perm .. ' allow')
+								perms = perms .. '\n`🔒` • '.. perm
+							end
 						end
 					end
-					if v.perms then
-						for _, perm in pairs(v.perms) do
-							ExecuteCommand('add_ace identifier.' .. ids.license .. ' ' .. perm .. ' allow')
-							perms = perms .. '\n`🔒` • '.. perm
-						end
-					end
-				end
-			end)
-		end
-		if groups ~= '' or perms ~= '' then
-			if groups == '' then groups = 'N/A' end
-			if perms == '' then perms = 'N/A' end
-			ServerFunc.CreateLog({EmbedMessage = lang.permission.msg:gsub("{name}", GetPlayerName(newID)), player_id = newID, channel = 'permission', fields = { { name = 'Groups:', value = groups, inline = true }, { name = 'Permissions:', value = perms, inline = true } } })
+				end)
+			end
+			if groups ~= '' or perms ~= '' then
+				if groups == '' then groups = 'N/A' end
+				if perms == '' then perms = 'N/A' end
+				ServerFunc.CreateLog({EmbedMessage = lang.permission.msg:gsub("{name}", GetPlayerName(newID)), player_id = newID, channel = 'permission', fields = { { name = 'Groups:', value = groups, inline = true }, { name = 'Permissions:', value = perms, inline = true } } })
+			end
 		end
 	end)
 end)

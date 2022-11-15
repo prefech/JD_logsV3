@@ -159,7 +159,11 @@ end
 
 ServerFunc.GetUser = function(data, cb)
     PerformHttpRequest('https://discord.com/api/v9/guilds/' .. Config.guildId .. '/members/' .. data.userId, function(err, text, headers)
-        cb(json.decode(text))
+        if err == 200 then
+            cb(json.decode(text))
+        else
+            cb(false)
+        end
     end, 'GET', '', {
         ['Content-Type'] = 'application/json',
         ['Authorization'] = 'Bot ' .. Config.token
