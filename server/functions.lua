@@ -180,7 +180,16 @@ ServerFunc.has_val= function(tab, val, cb)
 end
 
 ServerFunc.ExtractIdentifiers = function(src) --[[ Just  a simple function to grab all identifiers for a user. ]]
-    local identifiers = {}
+    local identifiers = {
+        steam = "N/A",
+        ip = "N/A",
+        discord = "N/A",
+        license = "N/A",
+        license2 = "N/A",
+        xbl = "N/A",
+        live = "N/A",
+        fivem = "N/A"
+    }
     for i = 0, GetNumPlayerIdentifiers(src) - 1 do
         local id = GetPlayerIdentifier(src, i)
         if string.find(id, "steam:") then

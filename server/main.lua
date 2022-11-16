@@ -32,6 +32,19 @@ CreateThread(function() --[[ Permissions check for buildin DiscordAcePerms ]]
 	end
 end)
 
+CreateThread(function()
+	if Config ~= nil then
+		if not Config.token then
+			print('^1Error:^0 Issue loading config file. Please follow the installation guild on the docs: https://docs.prefech.com')
+		end
+		if not Config.guildId then
+			print('^1Error:^0 Issue loading config file. Please follow the installation guild on the docs: https://docs.prefech.com')
+		end
+	else
+		print('^1Error:^0 Issue loading config file. Please follow the installation guild on the docs: https://docs.prefech.com')
+	end
+end)
+
 AddEventHandler("playerConnecting", function(name, setReason, deferrals)
 	local src = source
 	ServerFunc.CreateLog({ EmbedMessage = lang.join.msg:gsub("{name}", GetPlayerName(src)), player_id = src, channel = 'join'})
