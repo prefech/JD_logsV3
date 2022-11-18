@@ -1,5 +1,5 @@
 {
-    "date": "Nov 15, 2022",
-    "version": "3.1.1",
-    "changelog": "Fixed:\n• Small issues with Discord api not being able to get user info.\n• Some small fixes that caused errors."
+    "date": "Nov 18, 2022",
+    "version": "3.1.2",
+    "changelog": "Patch Notes cen be found here: https://forum.prefech.com/patch-notes/jd-logsv3/"
 }
