@@ -1,0 +1,66 @@
+{
+    "join": {
+        "msg": "**{name}** Verbindet sich gerade zum Server",
+        "update": "Überprüfe Discord Timeout Status",
+        "deny": "Verbindung verweigert für **{name}**\n**Grund:** `Discord Timeout`\n**Läuft ab:** {expire}",
+        "timeout": "⛔ Verbindung zum Server verweigert\n Währenddesen du einen Timeout auf unserem Discord hast, kannst du dich nicht verbinden.\nLäuft ab in `{expire}`"
+    },
+    "leave": {
+        "msg": "**{name}** Hat den Server verlassen.\n**Grund:** `{reason}`"
+    },
+    "chat": {
+        "msg": "**{name}:** `{msg}`"
+    },
+    "resource": {
+        "start_msg": "**{resource}** Wurde gestartet.",
+        "stop_msg": "**{resource}** Wurde Gestoppt."
+    },
+    "explosion": {
+        "msg": "**{name}** Hat eine Explosion ausgelöst.\n**Type:** `{type}`"
+    },
+    "shooting": {
+        "msg": "**{name}** Feuert `{weapon}` `{count} mal`",
+        "undefined": "Nicht definiert"
+    },
+    "damage": {
+        "msg": "**{name}** Wurde verletzt von `{type}` und hat `{health}` Leben verloren",
+        "type": {
+            "ai": "AI",
+            "ai_veh": "AI (Fahrzeug)",
+            "player": "{name}",
+            "player_veh": "{name} (Fahrzeug)",
+            "veh": "Ein Fahrzeug",
+            "obj": "Ein Objekt",
+            "self": "Sich selbst"
+        }
+    },
+    "nameChange": {
+        "msg": "**Namensänderung erkannt**\n`{old_name}` :arrow_right: `{new_name}`",
+        "game_msg": "Namensänderung erkannt `{old_name}` -> `{new_name}`"
+    },
+    "death": {
+        "suicide": {
+            "weapon": "**{name}** `hat selbstmord begangen` (*{type}* - *{weapon}*)",
+            "event": "**{name}** `hat selbstmord begangen` (*{type}*)",
+            "player": "**{name}** `hat selbstmord begangen`"
+        },
+        "ai": {
+            "weapon": "**{name}** wurde `{type}` (*{weapon}*) von **AI**",
+            "event": "**{name}** wurde `{type}` von **AI**",
+            "other": "**{name}** wurde `Getötet` von **AI**"
+        },
+        "player": {
+            "weapon": "**{name}** wurde `{type}` (*{weapon}*) von **{killer}**",
+            "event": "**{name}** wurde `{type}` von **{killer}**",
+            "other": "**{name}** wurde `Getötet` von **{killer}**"
+        },
+        "unknown": {
+            "weapon": "**{name}** wurde `{type}` (*{weapon}*) von **Unknown**",
+            "event": "**{name}** wurde `{type}` von **Unknown**",
+            "other": "**{name}** wurde `getötet` von **Unknown**"
+        }
+    },
+    "permission": {
+        "msg": "Berechtigungen/Gruppen hinzugefügt zu **{name}**"
+    }
+}
