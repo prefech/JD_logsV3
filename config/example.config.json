@@ -10,6 +10,7 @@
 
     "allLogs": true,
     "CheckTimeout": false,
+    "UseDiscordAcePerms": false,
 
     "weaponLog": true,
     "damageLog": true,

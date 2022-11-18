@@ -4,6 +4,7 @@ local channelRawFile = LoadResourceFile(GetCurrentResourceName(), "./config/chan
 Channels = json.decode(channelRawFile)
 local langFile = LoadResourceFile(GetCurrentResourceName(), "./lang/" .. Config.language .. ".json")
 lang = json.decode(langFile)
+local startup = false
 
 CreateThread(function() --[[ Permissions check for buildin DiscordAcePerms ]]
 	add_principal = true remove_principal = true addd_ace = true remove_ace = true
@@ -30,9 +31,7 @@ CreateThread(function() --[[ Permissions check for buildin DiscordAcePerms ]]
 		print('^3add_ace resource.' .. GetCurrentResourceName() .. ' command.add_ace allow^0')
 		print('^3add_ace resource.' .. GetCurrentResourceName() .. ' command.remove_ace allow^0')
 	end
-end)
 
-CreateThread(function()
 	if Config ~= nil then
 		if not Config.token then
 			print('^1Error:^0 Issue loading config file. Please follow the installation guild on the docs: https://docs.prefech.com')
@@ -43,6 +42,9 @@ CreateThread(function()
 	else
 		print('^1Error:^0 Issue loading config file. Please follow the installation guild on the docs: https://docs.prefech.com')
 	end
+
+	Wait(15 * 1000)
+	startup = true
 end)
 
 AddEventHandler("playerConnecting", function(name, setReason, deferrals)
@@ -81,11 +83,11 @@ end)
 
 AddEventHandler('onResourceStart', function (resourceName)
 	Wait(100)
-	ServerFunc.CreateLog({EmbedMessage = lang.resource.start_msg:gsub("{resource}", resourceName), channel = 'resource'})
+	ServerFunc.CreateLog({EmbedMessage = lang.resource.start_msg:gsub("{resource}", ServerFunc.decode(resourceName)), channel = 'resource'})
 end)
 
 AddEventHandler('onResourceStop', function (resourceName)
-	ServerFunc.CreateLog({EmbedMessage = lang.resource.stop_msg:gsub("{resource}", resourceName), channel = 'resource'})
+	ServerFunc.CreateLog({EmbedMessage = lang.resource.stop_msg:gsub("{resource}", ServerFunc.decode(resourceName)), channel = 'resource'})
 end)
 
 local explosionTypes = {'GRENADE', 'GRENADELAUNCHER', 'STICKYBOMB', 'MOLOTOV', 'ROCKET', 'TANKSHELL', 'HI_OCTANE', 'CAR', 'PLANE', 'PETROL_PUMP', 'BIKE', 'DIR_STEAM', 'DIR_FLAME', 'DIR_GAS_CANISTER', 'BOAT', 'SHIP_DESTROY', 'TRUCK', 'BULLET', 'SMOKEGRENADELAUNCHER', 'SMOKEGRENADE', 'BZGAS', 'FLARE', 'GAS_CANISTER', 'EXTINGUISHER', 'PROGRAMMABLEAR', 'TRAIN', 'BARREL', 'PROPANE', 'BLIMP', 'DIR_FLAME_EXPLODE', 'TANKER', 'PLANE_ROCKET', 'VEHICLE_BULLET', 'GAS_TANK', 'BIRD_CRAP', 'RAILGUN', 'BLIMP2', 'FIREWORK', 'SNOWBALL', 'PROXMINE', 'VALKYRIE_CANNON', 'AIR_DEFENCE', 'PIPEBOMB', 'VEHICLEMINE', 'EXPLOSIVEAMMO', 'APCSHELL', 'BOMB_CLUSTER', 'BOMB_GAS', 'BOMB_INCENDIARY', 'BOMB_STANDARD', 'TORPEDO', 'TORPEDO_UNDERWATER', 'BOMBUSHKA_CANNON', 'BOMB_CLUSTER_SECONDARY', 'HUNTER_BARRAGE', 'HUNTER_CANNON', 'ROGUE_CANNON', 'MINE_UNDERWATER', 'ORBITAL_CANNON', 'BOMB_STANDARD_WIDE', 'EXPLOSIVEAMMO_SHOTGUN', 'OPPRESSOR2_CANNON', 'MORTAR_KINETIC', 'VEHICLEMINE_KINETIC', 'VEHICLEMINE_EMP', 'VEHICLEMINE_SPIKE', 'VEHICLEMINE_SLICK', 'VEHICLEMINE_TAR', 'SCRIPT_DRONE', 'RAYGUN', 'BURIEDMINE', 'SCRIPT_MISSIL'}
@@ -118,35 +120,37 @@ AddEventHandler("playerJoining", function(newID, oldID) --[[ Name Change Logs / 
 			end
 		end
 	end
-	local groups = ''
-	local perms = ''
-	ServerFunc.GetUser({ userId =  ids.discord:gsub("discord:", "")}, function(data)
-		if data then
-			for k, v in pairs(Config.DiscordAcePerms) do
-				ServerFunc.has_val(data.roles, k, function(resp)
-					if resp then
-						if v.groups then
-							for _, group in pairs(v.groups) do
-								ExecuteCommand('add_principal identifier.' .. ids.license .. ' ' .. group)
-								groups = groups .. '\n`👥` • '.. group:gsub("group.", "")
+	if Config.UseDiscordAcePerms then
+		local groups = ''
+		local perms = ''
+		ServerFunc.GetUser({ userId =  ids.discord:gsub("discord:", "")}, function(data)
+			if data then
+				for k, v in pairs(Config.DiscordAcePerms) do
+					ServerFunc.has_val(data.roles, k, function(resp)
+						if resp then
+							if v.groups then
+								for _, group in pairs(v.groups) do
+									ExecuteCommand('add_principal identifier.' .. ids.license .. ' ' .. group)
+									groups = groups .. '\n`👥` • '.. group:gsub("group.", "")
+								end
+							end
+							if v.perms then
+								for _, perm in pairs(v.perms) do
+									ExecuteCommand('add_ace identifier.' .. ids.license .. ' ' .. perm .. ' allow')
+									perms = perms .. '\n`🔒` • '.. perm
+								end
 							end
 						end
-						if v.perms then
-							for _, perm in pairs(v.perms) do
-								ExecuteCommand('add_ace identifier.' .. ids.license .. ' ' .. perm .. ' allow')
-								perms = perms .. '\n`🔒` • '.. perm
-							end
-						end
-					end
-				end)
+					end)
+				end
+				if groups ~= '' or perms ~= '' then
+					if groups == '' then groups = 'N/A' end
+					if perms == '' then perms = 'N/A' end
+					ServerFunc.CreateLog({EmbedMessage = lang.permission.msg:gsub("{name}", GetPlayerName(newID)), player_id = newID, channel = 'permission', fields = { { name = 'Groups:', value = groups, inline = true }, { name = 'Permissions:', value = perms, inline = true } } })
+				end
 			end
-			if groups ~= '' or perms ~= '' then
-				if groups == '' then groups = 'N/A' end
-				if perms == '' then perms = 'N/A' end
-				ServerFunc.CreateLog({EmbedMessage = lang.permission.msg:gsub("{name}", GetPlayerName(newID)), player_id = newID, channel = 'permission', fields = { { name = 'Groups:', value = groups, inline = true }, { name = 'Permissions:', value = perms, inline = true } } })
-			end
-		end
-	end)
+		end)
+	end
 end)
 
 RegisterNetEvent("Prefech:JD_logsV3:GetConfigSettings")

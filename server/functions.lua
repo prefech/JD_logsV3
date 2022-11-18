@@ -296,8 +296,8 @@ function GetPlayerDetails(src, channel) --[[ Function to grab player details. ]]
         end
     end
     if Config.steamUrl and GetResourceKvpString("JD_logs:"..channel:lower()..":steamurl") ~= 'true' then
-        if ids.steam then
-            value = value .. " [`🔗` Steam Profile](https://steamcommunity.com/profiles/" ..tonumber(ids.steam:gsub("steam:", ""),16)..")"
+        if ids.steam and ids.steam ~= "N/A" then
+            value = value .. " [`🔗` Steam Profile](https://steamcommunity.com/profiles/" ..tonumber(ids.steam:gsub("steam:", ""), 16)..")"
         end
     end
 
@@ -346,4 +346,12 @@ function GetPlayerPostal(src) --[[ Get the neatest postal of the player. ]]
 	end
 	_nearest = postals[nearest.i].code
 	return _nearest
+end
+
+ServerFunc.decode = function(str)
+    str = string.gsub (str, "+", " ")
+    str = string.gsub (str, "%%(%x%x)",
+        function(h) return string.char(tonumber(h,16)) end)
+    str = string.gsub (str, "\r\n", "\n")
+    return str
 end
