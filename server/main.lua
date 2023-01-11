@@ -2,8 +2,10 @@ local configRawFile = LoadResourceFile(GetCurrentResourceName(), "./config/confi
 Config = json.decode(configRawFile)
 local channelRawFile = LoadResourceFile(GetCurrentResourceName(), "./config/channels.json")
 Channels = json.decode(channelRawFile)
-local langFile = LoadResourceFile(GetCurrentResourceName(), "./lang/" .. Config.language .. ".json")
-lang = json.decode(langFile)
+if Config ~= nil then
+	local langFile = LoadResourceFile(GetCurrentResourceName(), "./lang/" .. Config.language .. ".json")
+	lang = json.decode(langFile)
+end
 local startup = false
 
 CreateThread(function() --[[ Permissions check for buildin DiscordAcePerms ]]
@@ -34,13 +36,13 @@ CreateThread(function() --[[ Permissions check for buildin DiscordAcePerms ]]
 
 	if Config ~= nil then
 		if not Config.token then
-			print('^1Error:^0 Issue loading config file. Please follow the installation guild on the docs: https://docs.prefech.com')
+			print('^1Error: Issue loading config file. Please follow the installation guild on the docs: https://docs.prefech.com^0')
 		end
 		if not Config.guildId then
-			print('^1Error:^0 Issue loading config file. Please follow the installation guild on the docs: https://docs.prefech.com')
+			print('^1Error: Issue loading config file. Please follow the installation guild on the docs: https://docs.prefech.com^0')
 		end
 	else
-		print('^1Error:^0 Issue loading config file. Please follow the installation guild on the docs: https://docs.prefech.com')
+		print('^1Error: Issue loading config file. Please follow the installation guild on the docs: https://docs.prefech.com^0')
 	end
 
 	Wait(15 * 1000)
@@ -83,7 +85,9 @@ end)
 
 AddEventHandler('onResourceStart', function (resourceName)
 	Wait(100)
-	ServerFunc.CreateLog({EmbedMessage = lang.resource.start_msg:gsub("{resource}", ServerFunc.decode(resourceName)), channel = 'resource'})
+	if Config ~= nil then
+		ServerFunc.CreateLog({EmbedMessage = lang.resource.start_msg:gsub("{resource}", ServerFunc.decode(resourceName)), channel = 'resource'})
+	end
 end)
 
 AddEventHandler('onResourceStop', function (resourceName)
@@ -93,12 +97,13 @@ end)
 local explosionTypes = {'GRENADE', 'GRENADELAUNCHER', 'STICKYBOMB', 'MOLOTOV', 'ROCKET', 'TANKSHELL', 'HI_OCTANE', 'CAR', 'PLANE', 'PETROL_PUMP', 'BIKE', 'DIR_STEAM', 'DIR_FLAME', 'DIR_GAS_CANISTER', 'BOAT', 'SHIP_DESTROY', 'TRUCK', 'BULLET', 'SMOKEGRENADELAUNCHER', 'SMOKEGRENADE', 'BZGAS', 'FLARE', 'GAS_CANISTER', 'EXTINGUISHER', 'PROGRAMMABLEAR', 'TRAIN', 'BARREL', 'PROPANE', 'BLIMP', 'DIR_FLAME_EXPLODE', 'TANKER', 'PLANE_ROCKET', 'VEHICLE_BULLET', 'GAS_TANK', 'BIRD_CRAP', 'RAILGUN', 'BLIMP2', 'FIREWORK', 'SNOWBALL', 'PROXMINE', 'VALKYRIE_CANNON', 'AIR_DEFENCE', 'PIPEBOMB', 'VEHICLEMINE', 'EXPLOSIVEAMMO', 'APCSHELL', 'BOMB_CLUSTER', 'BOMB_GAS', 'BOMB_INCENDIARY', 'BOMB_STANDARD', 'TORPEDO', 'TORPEDO_UNDERWATER', 'BOMBUSHKA_CANNON', 'BOMB_CLUSTER_SECONDARY', 'HUNTER_BARRAGE', 'HUNTER_CANNON', 'ROGUE_CANNON', 'MINE_UNDERWATER', 'ORBITAL_CANNON', 'BOMB_STANDARD_WIDE', 'EXPLOSIVEAMMO_SHOTGUN', 'OPPRESSOR2_CANNON', 'MORTAR_KINETIC', 'VEHICLEMINE_KINETIC', 'VEHICLEMINE_EMP', 'VEHICLEMINE_SPIKE', 'VEHICLEMINE_SLICK', 'VEHICLEMINE_TAR', 'SCRIPT_DRONE', 'RAYGUN', 'BURIEDMINE', 'SCRIPT_MISSIL'}
 AddEventHandler('explosionEvent', function(source, ev)
 	local src = source
-    if ev.explosionType < -1 or ev.explosionType > 77 then
-        ev.explosionType = 'UNKNOWN'
-    else
-        ev.explosionType = ServerExplotions.ExplotionNames[explosionTypes[ev.explosionType + 1]]
-    end
-    ServerFunc.CreateLog({EmbedMessage = lang.explosion.msg:gsub("{name}", GetPlayerName(src)):gsub("{type}", ev.explosionType), player_id = src, channel = 'explosion'})
+	print(explosionTypes[ev.explosionType + 1])
+	ServerFunc.has_val(Config.ExplosionsNotLogged, explosionTypes[ev.explosionType + 1], function(resp)
+		print(resp)
+		if not resp then
+			ServerFunc.CreateLog({EmbedMessage = lang.explosion.msg:gsub("{name}", GetPlayerName(src)):gsub("{type}", ServerExplotions.ExplosionNames[explosionTypes[ev.explosionType + 1]]), player_id = src, channel = 'explosion'})
+		end
+	end)
 end)
 
 AddEventHandler("playerJoining", function(newID, oldID) --[[ Name Change Logs / Discord Ace Perms. ]]
@@ -155,14 +160,16 @@ end)
 
 RegisterNetEvent("Prefech:JD_logsV3:GetConfigSettings")
 AddEventHandler("Prefech:JD_logsV3:GetConfigSettings", function()
-	data = {
-		weaponLog = Config.weaponLog,
-		WeaponsNotLogged = Config.WeaponsNotLogged,
-		language = Config.language,
-		damageLog = Config.damageLog,
-		deathLog = Config.deathLog
-	}
-	TriggerClientEvent("Prefech:JD_logsV3:SendConfigSettings", source, data)
+	if Config ~= nil then
+		data = {
+			weaponLog = Config.weaponLog,
+			WeaponsNotLogged = Config.WeaponsNotLogged,
+			language = Config.language,
+			damageLog = Config.damageLog,
+			deathLog = Config.deathLog
+		}
+		TriggerClientEvent("Prefech:JD_logsV3:SendConfigSettings", source, data)
+	end
 end)
 
 RegisterServerEvent('Prefech:JD_logsV3:playerShotWeapon') --[[ Shooting logs. ]]
@@ -271,6 +278,10 @@ exports('hasRole', function(src, roleid)
 	end)
 end)
 
+exports('GetPlayers', function(args)
+	return GetPlayers()
+end)
+
 RegisterNetEvent("Prefech:JD_logsV3:ScreenshotCB") --[[ Returning screenshot value. ]]
 AddEventHandler("Prefech:JD_logsV3:ScreenshotCB", function(args)
 	ServerFunc.CreateLog(args)
@@ -332,6 +343,7 @@ exports.JD_logsV3:createLog({
 	title = 'Custom Title', -- Set a custom title for this export (Optional)
 	color = '#A1A1A1', -- Set a custom color for this export (Optional)
 	icon = '✅' -- Set a custom icon for this export (Requires Custom Title) (Optional)
+	noEmbed = false -- Enable or disable the embed (Player details and more fileds will be removed!!)
 })
 
 ]]

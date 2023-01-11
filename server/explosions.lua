@@ -1,6 +1,6 @@
 ServerExplotions = {}
 
-ServerExplotions.ExplotionNames = {
+ServerExplotions.ExplosionNames = {
 	['GRENADE'] = 'Grenade',
 	['GRENADELAUNCHER'] = 'Grenade Launcher',
 	['STICKYBOMB'] = 'Sticky Bomb',

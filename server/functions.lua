@@ -1,6 +1,18 @@
 ServerFunc = {}
 
 ServerFunc.CreateLog = function(data)
+
+    if Config ~= nil then
+		if not Config.token or Config.token == "" then
+			return print('^1Error:^0 Issue loading config file. Please follow the installation guild on the docs: https://docs.prefech.com')
+		end
+		if not Config.guildId or Config.guildId == "" then
+			return print('^1Error:^0 Issue loading config file. Please follow the installation guild on the docs: https://docs.prefech.com')
+		end
+	else
+		return print('^1Error:^0 Issue loading config file. Please follow the installation guild on the docs: https://docs.prefech.com')
+	end
+
     if data.screenshot then --[[ this log requires a screenshot to be made so we will transfer to client to grab a screenshot. ]]
         local channelsLoadFile = LoadResourceFile(GetCurrentResourceName(), "./config/channels.json")
         local theFile = json.decode(channelsLoadFile)
@@ -37,66 +49,74 @@ ServerFunc.CreateLog = function(data)
         color = data.color --[[ Custom color found and there was no channel in the channels.json ]]
     end
 
-    msg = {
-        content = null,
-        embeds = {
-            {
-                title = newTitle,
-                description = data.EmbedMessage,
-                color = ConvertColor(color),
-                footer = {
-                    text = "JD_logs V" .. GetResourceMetadata(GetCurrentResourceName(), 'version') .. "  •  Made by Prefech",
-                    icon_url = "https://prefech.com/i/icon3"
-                },
-                timestamp = os.date("%Y-%m-%d") .. "T" ..os.date("%H:%M:%S") .. ".0000".. Config.TimezoneOffset
+    if data.noEmbed or Channels[data.channel].noEmbed then
+        msg = {
+            content = data.EmbedMessage,
+        }
+    else
+        msg = {
+            content = null,
+            embeds = {
+                {
+                    title = newTitle,
+                    description = data.EmbedMessage,
+                    color = ConvertColor(color),
+                    footer = {
+                        text = "JD_logs V" .. GetResourceMetadata(GetCurrentResourceName(), 'version') .. "  •  Made by Prefech",
+                        icon_url = "https://prefech.com/assets/favicon/apple-touch-icon.png"
+                    },
+                    timestamp = os.date("%Y-%m-%d") .. "T" ..os.date("%H:%M:%S") .. ".0000".. Config.TimezoneOffset
+                }
             }
         }
-    }
+    end
 
-    if data.player_id then
-        msg.embeds[1].fields = {
-            {
-                name = "Player: ".. GetPlayerName(data.player_id),
-                value = GetPlayerDetails(data.player_id, data.channel)
+    if not data.noEmbed and not Channels[data.channel].noEmbed then
+        if data.player_id then
+            msg.embeds[1].fields = {
+                {
+                    name = "Player: ".. GetPlayerName(data.player_id),
+                    value = GetPlayerDetails(data.player_id, data.channel)
+                }
             }
-        }
-        if data.imageUrl then --[[ There is a image we got provided provide to the embed. ]]
-            table.insert(msg.embeds, {
-                title = "Screenshot: (" .. data.player_id .. ") - " .. GetPlayerName(data.player_id),
-                color = ConvertColor(color),
-                image = {
-                    url = data.imageUrl
-                }
-            })
+            if data.imageUrl then --[[ There is a image we got provided provide to the embed. ]]
+                table.insert(msg.embeds, {
+                    title = "Screenshot: (" .. data.player_id .. ") - " .. GetPlayerName(data.player_id),
+                    color = ConvertColor(color),
+                    image = {
+                        url = data.imageUrl
+                    }
+                })
+            end
         end
-    end
 
-    if data.player_2_id then
-        table.insert(msg.embeds[1].fields, {
-            name = "Player: ".. GetPlayerName(data.player_2_id),
-            value = GetPlayerDetails(data.player_2_id, data.channel)
-        })
-        if data.imageUrl_2 then --[[ There is a second image we got provided provide to the embed. ]]
-            table.insert(msg.embeds, {
-                title = "Screenshot: (" .. data.player_2_id .. ") - " .. GetPlayerName(data.player_2_id),
-                color = ConvertColor(color),
-                image = {
-                    url = data.imageUrl_2
-                }
-            })
-        end
-    end
-
-    if data.fields then
-        if not msg.embeds[1].fields then msg.embeds[1].fields = {} end
-        for k,v in pairs(data.fields) do
+        if data.player_2_id then
             table.insert(msg.embeds[1].fields, {
-                name = v.name,
-                value = v.value,
-                inline = v.inline
+                name = "Player: ".. GetPlayerName(data.player_2_id),
+                value = GetPlayerDetails(data.player_2_id, data.channel)
             })
+            if data.imageUrl_2 then --[[ There is a second image we got provided provide to the embed. ]]
+                table.insert(msg.embeds, {
+                    title = "Screenshot: (" .. data.player_2_id .. ") - " .. GetPlayerName(data.player_2_id),
+                    color = ConvertColor(color),
+                    image = {
+                        url = data.imageUrl_2
+                    }
+                })
+            end
         end
-	end
+
+        if data.fields then
+            if not msg.embeds[1].fields then msg.embeds[1].fields = {} end
+            for k,v in pairs(data.fields) do
+                table.insert(msg.embeds[1].fields, {
+                    name = v.name,
+                    value = v.value,
+                    inline = v.inline
+                })
+            end
+        end
+    end
 
     url = '' --[[ Get the url for the api used. ]]
     if tonumber(data.channel) == nil then --[[ Check ig the channel name is a number or a word. If its a number then we will assume its a channel id. ]]

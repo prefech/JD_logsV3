@@ -24,7 +24,7 @@ dependency 'screenshot-basic'
 
 -- Server Scripts
 server_scripts {
-    'server/explisions.lua',
+    'server/explosions.lua',
     'server/main.lua',
     'server/functions.lua',
     'server/commands.lua',

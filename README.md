@@ -13,10 +13,10 @@
 
   <p align="center">
     New JD_logs Server logger.
-    <br />    
-    <a href="https://discord.gg/prefech">Report Bug</a>
+    <br />
+    <a href="https://forum.prefech.com/topic/19-report-an-issue/">Report Bug</a>
     ·
-    <a href="https://discord.gg/prefech">Request Feature</a>
+    <a href="https://prefech.com/discord/">Request Feature</a>
     ·
     <a href="https://docs.prefech.com/jd_logsv3/">Documentation</a>
   </p>
@@ -48,7 +48,7 @@
 ### 🔧 Download & Installation
 
 1. Download the latest version from [github](https://github.com/prefech/JD_logsV3/)
-  - Click the `Code` button and then `Download ZIP`  
+  - Click the `Code` button and then `Download ZIP`
   ![](https://prefech.com/i/424808e1-f68a-4af3-b697-5c7e8cd32290 "Clone Screen")
 2. Put the JD_logsV3 folder in the server resource directory
     - Make sure to rename the folder to JD_logsV3.
@@ -75,4 +75,4 @@ Info | |
 Code is accessible | Yes
 Requirements | [Yes](https://github.com/prefech/JD_logsV3#-requirements)
 Documentation | [Here](https://docs.prefech.com/jd_logsv3/)
-Support	| Yes, we have a [Discord](https://discord.gg/prefech) server at your disposal
+Support	| Yes, we have a [Discord](https://prefech.com/discord) server at your disposal
